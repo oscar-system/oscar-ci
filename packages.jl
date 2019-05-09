@@ -11,6 +11,6 @@ Pkg.add(AbstractAlgebra)
 Pkg.add(Nemo)
 Pkg.add(Hecke)
 Pkg.add(Singular)
-# Pkg.add(Polymake)
+Pkg.add(Polymake)
 
 Pkg.update()
