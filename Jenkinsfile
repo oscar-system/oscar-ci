@@ -11,7 +11,7 @@ node {
         "JULIA_DEPOT_PATH=${workspace}/jenv/pkg",
         "JULIA_PROJECT=${workspace}/jenv/proj",
 	"POLYMAKE_CONFIG=${workspace}/local/bin/polymake-config",
-	"PATH=${workspace}/local:${env.PATH}",
+	"PATH=${workspace}/local/bin:${env.PATH}",
     ]
     stage('Preparation') { // for display purposes
         // Get some code from a GitHub repository
