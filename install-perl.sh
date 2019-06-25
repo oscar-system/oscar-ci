@@ -22,8 +22,8 @@ mkdir -p "$WORKSPACE/perl"
 pushd "$WORKSPACE/perl" >/dev/null
 tar xzf ../tar/perl-$PERL_VERSION.tar.gz
 pushd "perl-$PERL_VERSION" >/dev/null
-./configure.gnu --prefix="$PREFIX"
-make -j4
+sh Configure -de -Dprefix="$PREFIX" -Duseshrplib
+make -j8
 make install
 popd >/dev/null
 rm -rf "perl-$PERL_VERSION"

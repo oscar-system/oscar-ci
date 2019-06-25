@@ -50,7 +50,7 @@ node {
                 branch: "master"
         }
         dir("Hecke.jl") {
-            git url: "https://github.com/wbhart/Nemo.jl",
+            git url: "https://github.com/wbhart/Hecke.jl",
                 branch: "master"
         }
         dir("Singular.jl") {
