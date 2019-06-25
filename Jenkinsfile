@@ -83,10 +83,12 @@ node {
 	    }
 	}
         dir("gap") {
-            sh "./autogen.sh"
-            sh "./configure --with-gc=julia --with-julia=../julia/usr"
-            sh "make -j8"
-            sh "test -d pkg || make bootstrap-pkg-minimal"
+	    withEnv(stdenv) {
+		sh "./autogen.sh"
+		sh "./configure --with-gc=julia --with-julia=../julia/usr"
+		sh "make -j8"
+		sh "test -d pkg || make bootstrap-pkg-minimal"
+	    }
         }
         withEnv(stdenv) {
             sh "julia/julia meta/packages-${buildtype}.jl"
