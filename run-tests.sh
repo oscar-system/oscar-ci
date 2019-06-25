@@ -1,4 +1,4 @@
 #!/bin/sh
-for testfile in meta/tests/*.sh; do
-  sh $testfile
+for testfile in meta/tests/*; do
+  test -x "$testfile" && "./$testfile"
 done
