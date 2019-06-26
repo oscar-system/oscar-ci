@@ -1,10 +1,15 @@
 // vim:set ft=groovy:
 node {
     def workspace = pwd()
+    // URLs
     def metarepo = "file://${env.HOME}/develop/ci-meta"
+
+    // versions
     def julia_version = "${params.JULIA_VERSION}"
     def gap_version = "${params.GAP_VERSION}"
     def buildtype = "${params.BUILDTYPE}"
+
+    // environment variables
     def stdenv = [
         "GAPROOT=${workspace}/gap",
         "NEMO_SOURCE_BUILD=1",
@@ -42,15 +47,15 @@ node {
                 branch: "master"
         }
         dir("AbstractAlgebra.jl") {
-            git url: "https://github.com/wbhart/AbstractAlgebra.jl",
+            git url: "https://github.com/Nemocas/AbstractAlgebra.jl",
                 branch: "master"
         }
         dir("Nemo.jl") {
-            git url: "https://github.com/wbhart/Nemo.jl",
+            git url: "https://github.com/Nemocas/Nemo.jl",
                 branch: "master"
         }
         dir("Hecke.jl") {
-            git url: "https://github.com/wbhart/Hecke.jl",
+            git url: "https://github.com/thofma/Hecke.jl",
                 branch: "master"
         }
         dir("Singular.jl") {
