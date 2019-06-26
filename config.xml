@@ -44,7 +44,7 @@
       <configVersion>2</configVersion>
       <userRemoteConfigs>
         <hudson.plugins.git.UserRemoteConfig>
-          <url>/home/behrends/develop/ci-meta</url>
+          <url>/home/jenkins/develop/ci-meta</url>
         </hudson.plugins.git.UserRemoteConfig>
       </userRemoteConfigs>
       <branches>
