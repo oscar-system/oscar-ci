@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 SINGULAR_JL="$WORKSPACE/Singular.jl"
 git -C "$SINGULAR_JL" show HEAD:deps/build.jl | \
 awk '{ sub("https://github[.]com/Singular/Sources[.]git",
