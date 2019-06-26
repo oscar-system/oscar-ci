@@ -49,17 +49,38 @@
 FROM ubuntu:latest
 # Basic development and admin tools
 RUN apt-get update && apt-get install -y \
-  python-dev python3-dev ruby-dev perl \
-  openjdk-8-jdk \
-  gcc g++ gfortran make cmake ninja-build \
-  autoconf automake libtool-bin \
-  curl wget \
-  libboost-dev libgmp-dev libmpfr-dev libxml2-dev libxslt1-dev libpcre2-dev \
-  git mercurial subversion \
-  zsh \
-  tmux \
-  inetutils-ping inetutils-traceroute host dnsutils \
-  vim
+    autoconf \
+    automake \
+    cmake \
+    curl \
+    dnsutils \
+    g++ \
+    gcc \
+    gfortran \
+    git \
+    host \
+    inetutils-ping \
+    inetutils-traceroute \
+    libboost-dev \
+    libgmp-dev \
+    libmpfr-dev \
+    libpcre2-dev \
+    libtool-bin \
+    libxml2-dev \
+    libxslt1-dev \
+    make \
+    mercurial \
+    ninja-build \
+    openjdk-8-jdk \
+    perl \
+    python-dev \
+    python3-dev \
+    ruby-dev \
+    subversion \
+    tmux \
+    vim \
+    wget \
+    zsh
 # Create Jenkins user and directories
 ENV JENKINS_HOME /var/jenkins_home
 RUN mkdir -p /usr/share/jenkins /var/jenkins_home && \
