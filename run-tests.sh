@@ -1,4 +1,3 @@
 #!/bin/bash
-for testfile in meta/tests/*; do
-  test -x "$testfile" && "./$testfile"
-done
+mkdir -p logs
+python3 meta/run-tests.py
