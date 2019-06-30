@@ -64,8 +64,11 @@ node {
         }
         sh "meta/patch-singular-jl.sh"
 	// Polymake
-	// sh "meta/install-boost.sh" // needed for Polymake
-	sh "meta/install-perl.sh" // needed for Polymake
+	if (!fileExists("/.dockerenv")) {
+	    // We are running outside a docker container, create
+	    // a self-contained Perl installation.
+	    sh "meta/install-perl.sh" // needed for Polymake
+	}
         dir("Polymake.jl") {
             git url: "https://github.com/oscar-system/Polymake.jl",
                 branch: "master"

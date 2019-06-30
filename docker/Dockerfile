@@ -63,9 +63,18 @@ RUN apt-get update && apt-get install -y \
   inetutils-traceroute \
   libboost-dev \
   libgmp-dev \
+  libjson-perl \
   libmpfr-dev \
+  libncurses-dev \
   libpcre2-dev \
+  libperl-dev \
+  libreadline-dev \
+  libterm-readkey-perl \
+  libterm-readline-gnu-perl \
   libtool-bin \
+  libxml-libxml-perl \
+  libxml-libxslt-perl \
+  libxml-writer-perl \
   libxml2-dev \
   libxslt1-dev \
   make \
