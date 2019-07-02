@@ -16,7 +16,8 @@
 # permission problems.
 #
 # To build a docker image, run `make` or manually perform the following
-# steps:
+# steps (if you want to pin the installation to a specific Jenkins version,
+# replace "latest" with the version number, as in the Makefile):
 #
 #   1. Create an empty directory and cd to it.
 #   2. Copy `Dockerfile` to this directory.
