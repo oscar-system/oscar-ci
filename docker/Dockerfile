@@ -4,7 +4,7 @@
 #
 # where `jenkins_home` is a docker volume, which can be created with:
 #
-#   docker create volume jenkins_home
+#   docker volume create jenkins_home
 #
 # This volume will store Jenkins state (logs, workspaces) between runs and
 # reboots.
