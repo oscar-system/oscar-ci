@@ -1,6 +1,7 @@
 IMAGENAME=oscar-ci
 METAREPO=git@github.com:oscar-system/oscar-ci
-JENKINS_WAR=http://mirrors.jenkins.io/war-stable/2.176.1/jenkins.war
+JENKINS_VER=2.176.1
+JENKINS_WAR=http://mirrors.jenkins.io/war-stable/$(JENKINS_VER)/jenkins.war
 TMUX_CONF=/dev/null
 
 all:
