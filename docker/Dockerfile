@@ -39,7 +39,7 @@
 #
 # To start Jenkins from the container shell, run:
 #
-#   CMD java -jar /usr/share/jenkins/jenkins.war
+#   java -jar /usr/share/jenkins/jenkins.war
 #
 # The ci-meta directory is currently pulled from local storage, rather
 # than from GitHub directly. Again, this is to allow you to introduce
