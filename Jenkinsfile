@@ -80,13 +80,13 @@ node {
     }
     stage('Build') {
         dir("julia") {
-            sh "make -j8"
+            sh "make -j\$(nproc)"
         }
 	dir("polymake") {
 	    withEnv(stdenv) {
 	        sh "./configure --prefix=${workspace}/local"
 	        // sh "./configure --prefix=${workspace}/local --with-boost=${workspace}/local"
-		sh "ninja -C build/Opt -j8"
+		sh "ninja -C build/Opt -j\$(nproc)"
 		sh "ninja -C build/Opt install"
 	    }
 	}
@@ -94,7 +94,7 @@ node {
 	    withEnv(stdenv) {
 		sh "./autogen.sh"
 		sh "./configure --with-gc=julia --with-julia=../julia/usr"
-		sh "make -j8"
+		sh "make -j\$(nproc)"
 		sh "test -d pkg || make bootstrap-pkg-minimal"
 	    }
         }
