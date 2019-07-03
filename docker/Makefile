@@ -6,7 +6,7 @@ TMUX_CONF=/dev/null
 
 all:
 	test -d ci-meta || git clone $(METAREPO) ci-meta
-	test -f jenkins.war || wget $(JENKINS_WAR)
+	unzip -tqq jenkins.war >/dev/null 2>&1 || wget $(JENKINS_WAR)
 	test -f .tmux.conf || cp $(TMUX_CONF) .tmux.conf
 	docker build -t $(IMAGENAME) .
 
