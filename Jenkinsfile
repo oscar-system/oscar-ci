@@ -1,13 +1,21 @@
 // vim:set ft=groovy:
+parameters {
+    string("JULIA_VERSION", defaultValue: "master")
+    string("GAP_VERSION", defaultValue: "master")
+    choice("BUILDTYPE", choices: [ "src", "bin" ], defaultValue: "src")
+    string("BUILDJOBS", defaultValue: "8")
+}
+
 node {
     def workspace = pwd()
     // URLs
     def metarepo = "file://${env.HOME}/develop/ci-meta"
 
-    // versions
+    // parameters
     def julia_version = "${params.JULIA_VERSION}"
     def gap_version = "${params.GAP_VERSION}"
     def buildtype = "${params.BUILDTYPE}"
+    def jobs = "${params.BUILDJOBS}"
 
     // environment variables
     def stdenv = [
@@ -80,13 +88,13 @@ node {
     }
     stage('Build') {
         dir("julia") {
-            sh "make -j8"
+            sh "make -j${jobs}"
         }
 	dir("polymake") {
 	    withEnv(stdenv) {
 	        sh "./configure --prefix=${workspace}/local"
 	        // sh "./configure --prefix=${workspace}/local --with-boost=${workspace}/local"
-		sh "ninja -C build/Opt -j8"
+		sh "ninja -C build/Opt -j${jobs}"
 		sh "ninja -C build/Opt install"
 	    }
 	}
@@ -94,7 +102,7 @@ node {
 	    withEnv(stdenv) {
 		sh "./autogen.sh"
 		sh "./configure --with-gc=julia --with-julia=../julia/usr"
-		sh "make -j8"
+		sh "make -j${jobs}"
 		sh "test -d pkg || make bootstrap-pkg-minimal"
 	    }
         }
