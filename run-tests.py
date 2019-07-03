@@ -18,7 +18,8 @@ def run_tests():
     import sys, os, subprocess, datetime
     failed_tests = False
     buildnum = os.environ.get("BUILD_NUMBER", "0")
-    logfile = "logs/build-%s.log" % buildnum
+    logdir = "logs/build-%s" % buildnum
+    os.makedirs(logdir)
     for test in tests:
         testscript = "meta/tests/" + test.script
         try:
@@ -44,7 +45,8 @@ def run_tests():
         stop = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         print("Testing: %-19s at %s => %s" % (test.name, start, verbose_status))
         try:
-            with open(logfile, "ab") as logfp:
+            logfile = os.path.join(logdir, test.name + ".log")
+            with open(logfile, "wb") as logfp:
                 def log(s):
                     if type(s) == type(u""):
                         s = bytearray(s, "utf-8")
@@ -57,6 +59,11 @@ def run_tests():
         except:
             print("INTERNAL ERROR: cannot write test output to logfile.")
         sys.stdout.flush()
+    log_url = os.environ["BUILD_URL"]
+    if not log_url.endswith("/"):
+        log_url += "/"
+    log_url += "artifact/logs/build-" + buildnum + "/"
+    print("Logs: " + log_url)
     if failed_tests:
         exit(1)
 
