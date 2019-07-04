@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ ! -d "$JENKINS_HOME/jobs" ]; then
+  echo "Jenkins has not been setup yet."
+  exit 1
+fi
+
+if [ -z "$1" ]; then
+  echo "usage: create-stdjob <jobname>"
+  exit 1
+fi
+
+if [ -d "$JENKINS_HOME/jobs/$1" ]; then
+  echo "Job '$1' already exists."
+  exit 1
+fi
+
+JOBDIR="$JENKINS_HOME/jobs/$1"
+mkdir -p $JOBDIR
+cp -f $HOME/develop/ci-meta/config.xml $JOBDIR

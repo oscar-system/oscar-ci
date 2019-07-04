@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+if [ "$1" == "" ]; then
+  echo "usage: with-workspace <workspace-name> <cmd>"
+  exit 1
+fi
+
+export WORKSPACE="$JENKINS_HOME/workspace/$1"
+shift
+
+if [ -d "$WORKSPACE" ]; then
+  export GAPROOT="$WORKSPACE/gap"
+  export NEMO_SOURCE_BUILD=1
+  export JULIA_DEPOT_PATH="$WORKSPACE/jenv/pkg"
+  export JULIA_PROJECT="$WORKSPACE/jenv/proj"
+  export POLYMAKE_CONFIG="$WORKSPACE/local/bin/polymake-config"
+  export PATH="$WORKSPACE/local/bin:$PATH"
+  cd $WORKSPACE
+  exec "$@"
+else
+  echo "cannot find workspace directory: $WORKSPACE"
+  exit 1
+fi

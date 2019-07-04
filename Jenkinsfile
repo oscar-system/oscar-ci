@@ -99,6 +99,7 @@ node {
             if (rebuild != "none") {
                 dir("julia") {
                     sh "make -j${jobs}"
+		    sh "ln -sf ${workspace}/julia/julia ${workspace}/local/bin"
                 }
                 dir("polymake") {
                     withEnv(stdenv) {
