@@ -35,6 +35,17 @@
           <defaultValue>8</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>REBUILDMODE</name>
+          <description>Whether to rebuild only as needed, do a full rebuild or skip rebuilding (e.g. for trying out different tests).</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>normal</string>
+              <string>full</string>
+              <string>none</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
     <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
