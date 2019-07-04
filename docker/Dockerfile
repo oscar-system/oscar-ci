@@ -42,6 +42,17 @@
 #
 #   java -jar /usr/share/jenkins/jenkins.war
 #
+# Initial setup will require the following additional steps to get a
+# working configuration on jenkins_home:
+#
+# 1. Download and install the recommended plugins.
+# 2. Create an admin user.
+# 3. Create a job.
+# 4. Copy the configuration file from ~/develop/ci-meta/config.xml to
+#    overwrite the Job's config.xml file in the directory
+#    /var/jenkins_home/jobs/<name>/config.xml.
+# 5. Go to Manage Jenkins => Reload Configuration from Disk.
+#
 # The ci-meta directory is currently pulled from local storage, rather
 # than from GitHub directly. Again, this is to allow you to introduce
 # local commits for debugging purposes. In the long-term, we will pull
