@@ -11,7 +11,9 @@ parameters {
 node {
     def workspace = pwd()
     // URLs
-    def metarepo = "file://${env.HOME}/develop/ci-meta"
+    def metarepo = env.OSCAR_CI_REPO ?
+      "${env.OSCAR_CI_REPO}" :
+      "file://${env.HOME}/develop/ci-meta"
 
     // parameters
     def julia_version = "${params.JULIA_VERSION}"
@@ -31,12 +33,12 @@ node {
     ]
     try {
         stage('Preparation') { // for display purposes
+	    // Get some code from a GitHub repository
+	    dir("meta") {
+		git url: metarepo,
+		    branch: "master"
+	    }
             if (rebuild != "none") {
-                // Get some code from a GitHub repository
-                dir("meta") {
-                    git url: "file:///${env.HOME}/develop/ci-meta",
-                        branch: "master"
-                }
                 // major components
                 dir("julia") {
                     git url: "https://github.com/julialang/julia",
@@ -75,12 +77,14 @@ node {
                     git url: "https://github.com/oscar-system/Singular.jl",
                         branch: "master"
                 }
-                sh "meta/patch-singular-jl.sh"
+                sh script: "meta/patch-singular-jl.sh",
+		    label: "Make Singular.jl use local Singular installation."
                 // Polymake
                 if (!fileExists("/.dockerenv")) {
                     // We are running outside a docker container, create
                     // a self-contained Perl installation.
-                    sh "meta/install-perl.sh" // needed for Polymake
+                    sh script: "meta/install-perl.sh", // needed for Polymake
+		        label: "Create local Perl installation."
                 }
                 dir("Polymake.jl") {
                     git url: "https://github.com/oscar-system/Polymake.jl",
@@ -98,35 +102,46 @@ node {
         stage('Build') {
             if (rebuild != "none") {
                 dir("julia") {
-                    sh "make -j${jobs}"
-		    sh "ln -sf ${workspace}/julia/julia ${workspace}/local/bin"
+                    sh script: "make -j${jobs}",
+		        label: "Build Julia."
+		    sh script: "ln -sf ${workspace}/julia/julia ${workspace}/local/bin",
+		        label: "Install Julia."
                 }
                 dir("polymake") {
                     withEnv(stdenv) {
-                        sh "./configure --prefix=${workspace}/local"
-                        sh "ninja -C build/Opt -j${jobs}"
-                        sh "ninja -C build/Opt install"
+                        sh script: "./configure --prefix=${workspace}/local",
+			    label: "Configure Polymake."
+                        sh script: "ninja -C build/Opt -j${jobs}",
+                            label: "Build Polymake."
+                        sh script: "ninja -C build/Opt install",
+                            label: "Install Polymake."
                     }
                 }
                 dir("gap") {
                     withEnv(stdenv) {
-                        sh "./autogen.sh"
-                        sh "./configure --with-gc=julia --with-julia=../julia/usr"
-                        sh "make -j${jobs}"
-                        sh "test -d pkg || make bootstrap-pkg-minimal"
+                        sh script: "./autogen.sh",
+                            label: "Configure GAP."
+                        sh script: "./configure --with-gc=julia --with-julia=../julia/usr",
+                            label: "Configure GAP (step 2)."
+                        sh script: "make -j${jobs}",
+                            label: "Build GAP."
+                        sh script: "test -d pkg || make bootstrap-pkg-minimal",
+                            label: "Build GAP packages."
                     }
                 }
                 withEnv(stdenv) {
-                    sh "julia/julia meta/packages-${buildtype}.jl"
+                    sh script: "julia/julia meta/packages-${buildtype}.jl",
+                        label: "Build OSCAR packages."
                 }
             } else {
                 // skip build stage
-		echo "Skipping build stage."
+                echo "Skipping build stage."
             }
         }
         stage('Test') {
             withEnv(stdenv) {
-                sh "meta/run-tests.sh"
+                sh script: "meta/run-tests.sh",
+                    label: "Run tests."
             }
         }
     } finally {

@@ -52,7 +52,7 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
   locale-gen
 ENV LANG=en_US.UTF-8  LANGUAGE=en_US.UTF-8  LC_ALL=en_US.UTF-8   
 # Create Jenkins user and directories
-ENV JENKINS_HOME /var/jenkins_home
+ENV JENKINS_HOME=/var/jenkins_home
 RUN mkdir -p /usr/share/jenkins /var/jenkins_home && \
   groupadd -r jenkins && \
   useradd --no-log-init -r -g jenkins jenkins \
