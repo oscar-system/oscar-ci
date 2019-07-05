@@ -133,6 +133,10 @@ following it, e.g.:
 
     with-workspace oscar ls gap
 
+or:
+
+    with-workspace oscar julia
+
 The general syntax is:
 
     with-workspace <workspace name> <command>
