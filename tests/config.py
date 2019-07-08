@@ -5,5 +5,6 @@
     Test(name="Hecke.jl", script="test-hecke.sh", timeout=3600),
     Test(name="AbstractAlgebra.jl", script = "test-absalg.sh"),
     Test(name="Singular.jl", script = "test-singularjl.sh"),
+    Test(name="HomalgProject.jl", script = "test-HomalgProject_jl.sh"),
     Test(name="Polymake.jl", script = "test-polymakejl.sh"),
 ]

@@ -17,10 +17,12 @@ RUN apt-get update && apt-get install -y \
   inetutils-ping \
   inetutils-traceroute \
   libboost-dev \
+  libcdd-dev \
   libgmp-dev \
   libjson-perl \
   libmpfr-dev \
   libncurses-dev \
+  libntl-dev \
   libpcre2-dev \
   libperl-dev \
   libreadline-dev \

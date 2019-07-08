@@ -90,6 +90,10 @@ node {
                     git url: "https://github.com/oscar-system/Polymake.jl",
                         branch: "master"
                 }
+                dir("HomalgProject.jl") {
+                    git url: "https://github.com/homalg-project/HomalgProject.jl",
+                        branch: "master"
+                }
                 dir("OSCAR.jl") {
                     git url: "https://github.com/oscar-system/OSCAR.jl",
                         branch: "master"
@@ -127,6 +131,18 @@ node {
                             label: "Build GAP."
                         sh script: "test -d pkg || make bootstrap-pkg-minimal",
                             label: "Build GAP packages."
+                    }
+                }
+                dir("singular") {
+                    withEnv(stdenv) {
+                        sh script: "./autogen.sh",
+                            label: "Autogen Singular"
+                        sh script: "./configure --disable-polymake",
+                            label: "Configure Singular"
+                        sh script: "make -j${jobs}",
+                            label: "Make Singular"
+                        sh script: "ln -sf ${workspace}/singular/Singular/Singular ${workspace}/local/bin/Singular",
+                            label: "Install Singular."
                     }
                 }
                 withEnv(stdenv) {
