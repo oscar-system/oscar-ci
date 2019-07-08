@@ -127,6 +127,8 @@ node {
                             label: "Build GAP."
                         sh script: "test -d pkg || make bootstrap-pkg-minimal",
                             label: "Build GAP packages."
+		        sh script: "ln -sf ${workspace}/gap/bin/gap.sh ${workspace}/local/bin/gap",
+		            label: "Install GAP."
                     }
                 }
                 withEnv(stdenv) {
