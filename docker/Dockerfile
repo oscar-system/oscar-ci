@@ -75,4 +75,4 @@ EXPOSE 8080
 VOLUME /var/jenkins_home
 WORKDIR /home/jenkins
 # Run shell by default for container testing/development
-CMD bash -l
+CMD /usr/local/bin/jenkins
