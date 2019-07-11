@@ -129,7 +129,7 @@ node {
                             label: "Configure GAP (step 2)."
                         sh script: "make -j${jobs}",
                             label: "Build GAP."
-                        sh script: "test -d pkg || make bootstrap-pkg-full; cd pkg; ../bin/BuildPackages.sh",
+                        sh script: "test -d pkg || (make bootstrap-pkg-full && cd pkg && ../bin/BuildPackages.sh)",
                             label: "Build GAP packages."
                     }
                 }
