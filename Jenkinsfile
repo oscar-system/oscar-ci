@@ -38,6 +38,8 @@ node {
 		git url: metarepo,
 		    branch: "master"
 	    }
+	    sh script: "mkdir -p ${workspace}/local/bin",
+	        label: "Make local directories."
             if (rebuild != "none") {
                 // major components
                 dir("julia") {
