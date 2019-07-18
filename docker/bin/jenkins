@@ -1,2 +1,2 @@
 #!/bin/sh
-exec java -jar /usr/share/jenkins/jenkins.war "$@"
+java -jar /usr/share/jenkins/jenkins.war "$@"
