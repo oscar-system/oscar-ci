@@ -34,6 +34,9 @@ node {
     ]
     try {
         stage('Preparation') { // for display purposes
+            if (rebuild == "full") {
+                cleanWs disableDeferredWipeout: true, deleteDirs: true
+            }
 	    // Get some code from a GitHub repository
 	    dir("meta") {
 		git url: metarepo,
