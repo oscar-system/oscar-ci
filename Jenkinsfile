@@ -105,7 +105,7 @@ node {
                         branch: "master"
                 }
                 // GAP packages
-                dir("gap/pkg/OscarForHomalg") {
+                dir("OscarForHomalg") {
                     git url: "https://github.com/homalg-project/OscarForHomalg.git",
                         branch: "master"
                 }
@@ -162,14 +162,15 @@ node {
                     sh script: "julia/julia meta/packages-${buildtype}.jl",
                         label: "Build OSCAR packages."
                 }
-                dir("gap") {
-		    withEnv(stdenv) {
-		        def GAP_jl_PATH = sh(returnStdout: true,
-			    script: "julia ${workspace}/meta/gappath.jl").trim()
-		        sh script: "ln -s ${GAP_jl_PATH}/pkg/GAPJulia/ ${workspace}/gap/pkg/GAPJulia",
-                            label: "Install GAPJulia packages from GAP.jl in GAP pkg folder"
-	            }
-                }
+		// install Oscar GAP packages
+		withEnv(stdenv) {
+		    def GAP_jl_PATH = sh(returnStdout: true,
+			script: "julia meta/gappath.jl").trim()
+		    sh script: "sh meta/install-gap-pkg.sh ${workspace}/OscarForHomalg",
+			label: "Install OscarForHomalg packages in GAP pkg folder"
+		    sh script: "sh meta/install-gap-pkg.sh ${GAP_jl_PATH}/pkg/GAPJulia",
+			label: "Install GAPJulia packages from GAP.jl in GAP pkg folder"
+		}
             } else {
                 // skip build stage
                 echo "Skipping build stage."
