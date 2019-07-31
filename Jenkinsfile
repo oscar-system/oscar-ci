@@ -100,6 +100,11 @@ node {
                     git url: "https://github.com/oscar-system/OSCAR.jl",
                         branch: "master"
                 }
+                // GAP packages
+                dir("gap/pkg/OscarForHomalg") {
+                    git url: "https://github.com/homalg-project/OscarForHomalg.git",
+                        branch: "master"
+                }
             } else {
                 // skip preparation
 		echo "Skipping preparation stage."
@@ -133,6 +138,8 @@ node {
                             label: "Build GAP."
                         sh script: "test -d pkg || (make bootstrap-pkg-full && cd pkg && ../bin/BuildPackages.sh)",
                             label: "Build GAP packages."
+		        sh script: "ln -sf ${workspace}/gap/bin/gap.sh ${workspace}/local/bin/gap",
+		            label: "Install GAP."
                     }
                 }
                 dir("singular") {
@@ -146,6 +153,13 @@ node {
                         sh script: "ln -sf ${workspace}/singular/Singular/Singular ${workspace}/local/bin/Singular",
                             label: "Install Singular."
                     }
+                }
+                dir("gap") {
+		    withEnv(stdenv) {
+		        def GAP_jl_PATH = sh(returnStdout: true, script: "julia -e 'import Pkg; print(Pkg.dir(\"GAP\"))'").trim()
+		        sh script: "ln -s ${GAP_jl_PATH}/pkg/GAPJulia/ ${workspace}/gap/pkg/GAPJulia",
+                            label: "Install GAPJulia packages from GAP.jl in GAP pkg folder"
+	            }
                 }
                 withEnv(stdenv) {
                     sh script: "julia/julia meta/packages-${buildtype}.jl",

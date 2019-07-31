@@ -1,4 +1,5 @@
 [
+    Test(name="OscarForHomalg", script = "test-OscarForHomalg.sh"),
     Test(name="GAP", script="test-gap.sh"),
     Test(name="GAP.jl", script="test-gapjl.sh"),
     Test(name="Nemo.jl", script="test-nemo.sh"),
