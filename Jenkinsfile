@@ -158,16 +158,17 @@ node {
                             label: "Install Singular."
                     }
                 }
-                dir("gap") {
-		    withEnv(stdenv) {
-		        def GAP_jl_PATH = sh(returnStdout: true, script: "julia -e 'import Pkg; print(Pkg.dir(\"GAP\"))'").trim()
-		        sh script: "ln -s ${GAP_jl_PATH}/pkg/GAPJulia/ ${workspace}/gap/pkg/GAPJulia",
-                            label: "Install GAPJulia packages from GAP.jl in GAP pkg folder"
-	            }
-                }
                 withEnv(stdenv) {
                     sh script: "julia/julia meta/packages-${buildtype}.jl",
                         label: "Build OSCAR packages."
+                }
+                dir("gap") {
+		    withEnv(stdenv) {
+		        def GAP_jl_PATH = sh(returnStdout: true,
+			    script: "julia ${workspace}/meta/gappath.jl").trim()
+		        sh script: "ln -s ${GAP_jl_PATH}/pkg/GAPJulia/ ${workspace}/gap/pkg/GAPJulia",
+                            label: "Install GAPJulia packages from GAP.jl in GAP pkg folder"
+	            }
                 }
             } else {
                 // skip build stage
