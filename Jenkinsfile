@@ -100,8 +100,8 @@ node {
                     git url: "https://github.com/homalg-project/HomalgProject.jl",
                         branch: "master"
                 }
-                dir("OSCAR.jl") {
-                    git url: "https://github.com/oscar-system/OSCAR.jl",
+                dir("Oscar.jl") {
+                    git url: "https://github.com/oscar-system/Oscar.jl",
                         branch: "master"
                 }
                 // GAP packages
