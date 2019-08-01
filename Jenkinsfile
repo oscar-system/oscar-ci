@@ -184,5 +184,6 @@ node {
         }
     } finally {
         archiveArtifacts artifacts: "logs/build-${env.BUILD_NUMBER}/*"
+        archiveArtifacts artifacts: "jenv/proj/*"
     }
 }
