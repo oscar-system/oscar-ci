@@ -8,5 +8,7 @@
     Test(name="Singular.jl", script = "test-singularjl.sh"),
     Test(name="HomalgProject.jl", script = "test-HomalgProject_jl.sh"),
     Test(name="Polymake.jl", script = "test-polymakejl.sh"),
+    Test(name="JuliaInterface", script="test-JuliaInterface.sh"),
+    Test(name="JuliaExperimental", script="test-JuliaExperimental.sh"),
     Test(name="Oscar.jl", script = "test-oscar.sh"),
 ]
