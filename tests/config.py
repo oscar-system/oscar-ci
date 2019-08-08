@@ -11,4 +11,5 @@
     Test(name="JuliaInterface", script="test-JuliaInterface.sh"),
     Test(name="JuliaExperimental", script="test-JuliaExperimental.sh"),
     # Test(name="Oscar.jl", script = "test-oscar.sh"),
+    Test(name="NemoLinearAlgebraForCAP", script = "test-NemoLinearAlgebraForCAP.sh"),
 ]
