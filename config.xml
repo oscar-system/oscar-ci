@@ -10,7 +10,7 @@
         <hudson.model.StringParameterDefinition>
           <name>JULIA_VERSION</name>
           <description>Which branch/version of Julia to build? (Must be a valid Git ref.)</description>
-          <defaultValue>release-1.1</defaultValue>
+          <defaultValue>release-1.2</defaultValue>
           <trim>true</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
