@@ -22,12 +22,20 @@ def run_tests():
     os.makedirs(logdir)
     for test in tests:
         testscript = "meta/tests/" + test.script
+        logfile = os.path.join(logdir, test.name + ".log")
+        def log(s):
+            with open(logfile, "ab") as logfp:
+                if type(s) == type(u""):
+                    s = bytearray(s, "utf-8")
+                logfp.write(s)
+                if not s.endswith(b"\n"):
+                    logfp.write(b"\n")
         try:
             start = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-            result = subprocess.run([testscript],
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                timeout = test.timeout)
-            output = result.stdout
+            log("=== %s (%s) at %s\n" % (test.name, testscript, start))
+            cmd = testscript
+            cmd += " >>" + logfile + " 2>&1"
+            result = subprocess.run(cmd, shell=True, timeout = test.timeout)
             exitcode = result.returncode
             if exitcode == 0:
                 verbose_status = "SUCCESS"
@@ -43,21 +51,8 @@ def run_tests():
             exitcode = -1
         failed_tests = failed_tests or exitcode != 0
         stop = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        log("=== %s at %s\n" % (verbose_status, stop))
         print("Testing: %-19s at %s => %s" % (test.name, start, verbose_status))
-        try:
-            logfile = os.path.join(logdir, test.name + ".log")
-            with open(logfile, "wb") as logfp:
-                def log(s):
-                    if type(s) == type(u""):
-                        s = bytearray(s, "utf-8")
-                    logfp.write(s)
-                    if not s.endswith(b"\n"):
-                        logfp.write(b"\n")
-                log("=== %s (%s) at %s\n" % (test.name, testscript, start))
-                log(output)
-                log("=== %s at %s\n" % (verbose_status, stop))
-        except:
-            print("INTERNAL ERROR: cannot write test output to logfile.")
         sys.stdout.flush()
     log_url = os.environ["BUILD_URL"]
     if not log_url.endswith("/"):
