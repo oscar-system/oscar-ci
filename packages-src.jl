@@ -1,4 +1,16 @@
 using Pkg
+
+function PkgAdd(pkg)
+  try
+    Pkg.add(pkg)
+  catch
+    for (exception, backtrace) in Base.catch_stack()
+      showerror(stdout, exception, backtrace)
+      println()
+    end
+  end
+end
+
 GAP = PackageSpec(path="GAP.jl")
 AbstractAlgebra = PackageSpec(path="AbstractAlgebra.jl")
 Nemo = PackageSpec(path="Nemo.jl")
@@ -8,13 +20,13 @@ Polymake = PackageSpec(path="Polymake.jl")
 HomalgProject = PackageSpec(path="HomalgProject.jl")
 Oscar = PackageSpec(path="Oscar.jl")
 
-Pkg.add(GAP)
-Pkg.add(AbstractAlgebra)
-Pkg.add(Nemo)
-Pkg.add(Hecke)
-Pkg.add(Singular)
-Pkg.add(Polymake)
-Pkg.add(HomalgProject)
-Pkg.add(Oscar)
+PkgAdd(GAP)
+PkgAdd(AbstractAlgebra)
+PkgAdd(Nemo)
+PkgAdd(Hecke)
+PkgAdd(Singular)
+PkgAdd(Polymake)
+PkgAdd(HomalgProject)
+PkgAdd(Oscar)
 
 Pkg.update()
