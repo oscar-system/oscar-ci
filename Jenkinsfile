@@ -152,6 +152,8 @@ node {
                 }
                 dir("singular") {
                     withEnv(stdenv) {
+		        sh script: "git clean -fdxq",
+			    label: "Clean directory."
                         sh script: "./autogen.sh",
                             label: "Autogen Singular"
                         sh script: "./configure --disable-polymake",
