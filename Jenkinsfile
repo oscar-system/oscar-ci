@@ -156,7 +156,7 @@ node {
 			    label: "Clean directory."
                         sh script: "./autogen.sh",
                             label: "Autogen Singular"
-                        sh script: "./configure --disable-polymake --with-flint=no",
+                        sh script: "./configure --disable-polymake",
                             label: "Configure Singular"
                         sh script: "make -j${jobs}",
                             label: "Make Singular"
