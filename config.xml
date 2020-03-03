@@ -16,7 +16,7 @@
         <hudson.model.StringParameterDefinition>
           <name>GAP_VERSION</name>
           <description>Which branch/version of GAP to build? (Must be a valid Git ref.)</description>
-          <defaultValue>master</defaultValue>
+          <defaultValue>stable-4.11</defaultValue>
           <trim>true</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>

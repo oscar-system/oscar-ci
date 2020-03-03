@@ -1,7 +1,7 @@
 // vim:set ft=groovy:
 parameters {
     string("JULIA_VERSION", defaultValue: "master")
-    string("GAP_VERSION", defaultValue: "master")
+    string("GAP_VERSION", defaultValue: "stable-4.11")
     choice("BUILDTYPE", choices: [ "src", "bin" ], defaultValue: "src")
     string("BUILDJOBS", defaultValue: "8")
     choice("REBUILDMODE", choices: [ "normal", "full", "none" ],
