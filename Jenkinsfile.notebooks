@@ -1,0 +1,53 @@
+// vim:set ft=groovy:
+node {
+  def errors = 0
+  def stdenv = [
+    "PATH=${workspace}/local/bin:${env.PATH}",
+  ]
+  def nbtest = { String path ->
+    try {
+      sh "${workspace}/nbtests/jupyter-julia ${path}"
+    } catch (Exception err) {
+      errors++
+      currentBuild.result = "SUCCESS"
+    }
+  }
+  stage("Preparation") {
+    dir("julia") {
+      git url: "https://github.com/julialang/julia",
+          branch: "release-1.3"
+    }
+    dir("nbtests") {
+      git url: "https://github.com/rbehrends/jupyter-tests",
+          branch: "master"
+    }
+    dir("notebooks") {
+      git url: "https://github.com/oscar-system/OSCARBinder",
+          branch: "master"
+    }
+  }
+  stage("Build") {
+    withEnv(stdenv) {
+      dir("julia") {
+	sh "make -j8"
+	sh "mkdir -p ${workspace}/local/bin"
+	sh "ln -sf ${workspace}/julia/julia ${workspace}/local/bin"
+      }
+    }
+    withEnv(stdenv) {
+      sh "${workspace}/nbtests/install-oscar"
+    }
+  }
+  stage("Test") {
+    withEnv(stdenv) {
+      def notebooks = sh(script: "find ${workspace}/notebooks -name *.ipynb",
+        returnStdout: true).trim().split("\\r?\\n")
+      for (notebook in notebooks) {
+        nbtest notebook
+      }
+      if (errors > 0) {
+        currentBuild.result = "FAILURE"
+      }
+    }
+  }
+}

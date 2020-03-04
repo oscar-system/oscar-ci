@@ -39,9 +39,11 @@ RUN apt-get update && apt-get install -y \
   mercurial \
   ninja-build \
   openjdk-8-jdk \
+  pandoc \
   perl \
   python-dev \
   python3-dev \
+  python3-venv \
   ruby-dev \
   screen \
   subversion \
