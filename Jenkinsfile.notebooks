@@ -3,10 +3,11 @@ node {
   def errors = 0
   def stdenv = [
     "PATH=${workspace}/local/bin:${env.PATH}",
+    "GAPROOT=${workspace}/gap",
   ]
   def nbtest = { String path ->
     try {
-      sh "${workspace}/nbtests/jupyter-julia ${path}"
+      sh "${workspace}/nbtests/jupyter-test ${path}"
     } catch (Exception err) {
       errors++
       currentBuild.result = "SUCCESS"
@@ -25,13 +26,26 @@ node {
       git url: "https://github.com/oscar-system/OSCARBinder",
           branch: "master"
     }
+    dir("gap") {
+      git url: "https://github.com/gap-system/gap"
+          branch: "stable-4.11"
+    }
   }
   stage("Build") {
+    sh "mkdir -p ${workspace}/local/bin"
     withEnv(stdenv) {
       dir("julia") {
 	sh "make -j8"
-	sh "mkdir -p ${workspace}/local/bin"
 	sh "ln -sf ${workspace}/julia/julia ${workspace}/local/bin"
+      }
+    }
+    withEnv(stdenv) {
+      dir("gap") {
+        sh "./autogen.sh"
+	sh "./configure --with-gc=julia --with-julia=${workspace}/julia"
+	sh "make -j8"
+	sh "test -d pkg || (make bootstrap-pkg-full && cd pkg && ../bin/BuildPackages.sh)"
+	sh "ln -sf ${workspace}/gap/bin/gap.sh ${workspace}/local/bin/gap"
       }
     }
     withEnv(stdenv) {
@@ -43,7 +57,7 @@ node {
       def notebooks = sh(script: "find ${workspace}/notebooks -name *.ipynb",
         returnStdout: true).trim().split("\\r?\\n")
       for (notebook in notebooks) {
-        nbtest notebook
+	nbtest notebook
       }
       if (errors > 0) {
         currentBuild.result = "FAILURE"

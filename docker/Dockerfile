@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
   gfortran \
   git \
   host \
+  jq \
   inetutils-ping \
   inetutils-traceroute \
   libboost-dev \
@@ -34,6 +35,7 @@ RUN apt-get update && apt-get install -y \
   libxml-writer-perl \
   libxml2-dev \
   libxslt1-dev \
+  libzmq3-dev \
   locales \
   make \
   mercurial \
