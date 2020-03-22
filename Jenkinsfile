@@ -176,9 +176,10 @@ node {
 			label: "Install OscarForHomalg package in GAP pkg folder"
 		    sh script: "sh meta/install-gap-pkg.sh ${workspace}/NemoLinearAlgebraForCAP",
 			label: "Install NemoLinearAlgebraForCAP package in GAP pkg folder"
-		    sh script: "sh meta/install-gap-pkg.sh ${GAP_jl_PATH}/pkg/JuliaInterface",
+		    sh script: "sh meta/install-gap-pkg.sh ${GAP_jl_PATH}/pkg/JuliaInterface"
+			label: "Install GAPJulia packages from GAP.jl in GAP pkg folder (part 1)"
 		    sh script: "sh meta/install-gap-pkg.sh ${GAP_jl_PATH}/pkg/JuliaExperimental",
-			label: "Install GAPJulia packages from GAP.jl in GAP pkg folder"
+			label: "Install GAPJulia packages from GAP.jl in GAP pkg folder (part 2)"
 		}
             } else {
                 // skip build stage
