@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
-cd gap/pkg/GAPJulia/JuliaInterface
+cd gap/pkg/JuliaInterface
 export TERM="dumb"
-make check
+# make test
+gap tst/testall.g
