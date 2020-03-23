@@ -46,6 +46,7 @@ RUN apt-get update && apt-get install -y \
   python-dev \
   python3-dev \
   python3-venv \
+  python3-yaml \
   ruby-dev \
   screen \
   subversion \
@@ -68,6 +69,7 @@ RUN mkdir -p /usr/share/jenkins /var/jenkins_home && \
 COPY bin/* /usr/local/bin/
 # Controller repo: git clone git@github.com:oscar-system/oscar-ci ci-meta
 COPY ci-meta /home/jenkins/develop/ci-meta
+COPY credentials.yaml /home/jenkins/credentials.yaml
 # Regular jenkins.war file
 COPY jenkins.war /usr/share/jenkins
 # Configure environment for user "jenkins"
