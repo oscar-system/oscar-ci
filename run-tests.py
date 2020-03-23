@@ -78,24 +78,28 @@ def upload(job, build, files):
 
 # Test runner
 
-from collections import namedtuple
-
 default_timeout = 1800
 
-TestRecord = namedtuple("Test", ["name", "script", "timeout"])
+class FileLock:
+    def __init__(self, path):
+        self.path = path + ".lock"
+    def __enter__(self):
+        import fcntl
+        self.file = open(self.path, "w+")
+        fcntl.lockf(self.file, fcntl.LOCK_EX)
+    def __exit__(self, *args):
+        import fcntl
+        fcntl.lockf(self.file, fcntl.LOCK_UN)
+        self.file.close()
 
-def Test(name, script=None, timeout=default_timeout):
-    if not script:
-        # make name lower case and strip all non alpha-numeric characters
-        sname = "".join([ ch for ch in name.lower() if ch.isalnum() ])
-        script = "test-%s.sh" % sname
-    return TestRecord(name, script, timeout)
-
-with open("meta/tests/config.py") as config:
-    tests = eval(config.read(), globals(), locals())
+def load_config():
+    import yaml
+    global tests
+    with open("meta/tests/config.yaml") as config:
+        tests = yaml.safe_load(config.read())
 
 def run_tests():
-    import sys, os, subprocess, datetime
+    import sys, os, subprocess, datetime, shelve
     failed_tests = False
     buildnum = os.environ.get("BUILD_NUMBER", "0")
     # Create log dir if it does not exist yet
@@ -103,7 +107,13 @@ def run_tests():
     except: pass
     # Output files
     logdir = "logs/build-%s" % buildnum
-    log_url = os.environ["BUILD_URL"]
+    build_url = os.environ["BUILD_URL"]
+    job = os.environ["JOB_NAME"]
+    jenkins_home = os.environ["JENKINS_HOME"]
+    if not build_url.endswith("/"):
+        build_url += "/"
+    log_url = build_url + "artifact/logs/build-" + buildnum
+    proj_url = build_url + "jenv/proj"
     try: os.mkdir(logdir)
     except: pass
     successes = []
@@ -114,8 +124,13 @@ def run_tests():
         else:
             failures.append(s)
     for test in tests:
-        testscript = "meta/tests/" + test.script
-        logfile = os.path.join(logdir, test.name + ".log")
+        testscript = "meta/tests/" + test["script"]
+        testname = test["name"]
+        if "timeout" in test:
+            timeout = test["timeout"]
+        else:
+            timeout = default_timeout
+        logfile = os.path.join(logdir, testname + ".log")
         def log(s):
             with open(logfile, "ab") as logfp:
                 if type(s) == type(u""):
@@ -124,10 +139,10 @@ def run_tests():
         try:
             start_time = datetime.datetime.now()
             start = start_time.strftime("%Y-%m-%d %H:%M")
-            log("=== %s (%s) at %s\n" % (test.name, testscript, start))
+            log("=== %s (%s) at %s\n" % (testname, testscript, start))
             cmd = testscript
             cmd += " >>" + logfile + " 2>&1"
-            result = subprocess.run(cmd, shell=True, timeout = test.timeout)
+            result = subprocess.run(cmd, shell=True, timeout = timeout)
             exitcode = result.returncode
             if exitcode == 0:
                 verbose_status = "SUCCESS"
@@ -145,39 +160,48 @@ def run_tests():
             verbose_status = "INTERNAL ERROR"
             statuscode = "\u2049"
             exitcode = -1
+        jobstate_dir = jenkins_home + "/jobstate"
+        jobstate = mkpath(jobstate_dir, job)
+        os.makedirs(jobstate_dir, exist_ok=True)
+        with FileLock(jobstate):
+            if exitcode == 0:
+                last_success = ""
+                with shelve.open(jobstate) as db:
+                    db[testname] = (buildnum, build_url)
+            else:
+                with shelve.open(jobstate) as db:
+                    if testname in db:
+                        last_success = "[%s](%s)" % db[testname]
+                    else:
+                        last_success = "unknown"
         failed_tests = failed_tests or exitcode != 0
         stop_time = datetime.datetime.now()
         stop = stop_time.strftime("%Y-%m-%d %H:%M")
         duration = (stop_time - start_time).seconds
-        testsummary = "| %s | %s [%s](%s.log) | %s | %s |" % \
-            (test.name, statuscode, verbose_status,
-             log_url + "artifact/logs/build-" + buildnum + "/" + test.name,
-             start, "%d seconds" % duration)
+        testsummary = "| %s | %s [%s](%s) | %s | %s | %s |" % \
+            (testname, statuscode, verbose_status,
+             log_url + "/" + testname + ".log", start, "%d seconds" % duration,
+             last_success)
         report(testsummary, exitcode)
         log("=== %s at %s\n" % (verbose_status, stop))
-        print("Testing: %-19s at %s => %s" % (test.name, start, verbose_status))
+        print("Testing: %-19s at %s => %s" % (testname, start, verbose_status))
         sys.stdout.flush()
-    if not log_url.endswith("/"):
-        log_url += "/"
-    log_url += "artifact/logs/build-" + buildnum + "/"
-    print("Logs: " + log_url)
-    job = os.environ["JOB_NAME"]
+    print("Logs: " + log_url + "/")
     report_form = ""
+    report_form += "## [Build %s](%s)\n\n" % (buildnum, build_url)
+    report_form += \
+        "| Test Name    | Result | Start | Duration | Last Success |\n" + \
+        "|:-------------|:-------|:------|:---------|:-------------|\n"
     if len(failures) > 0:
-        report_form += \
-            "| Failed Tests | Result | Start | Duration |\n" + \
-            "|--------------|--------|-------|----------|\n"
         report_form += "\n".join(failures)
-        report_form += "\n\n"
+        report_form += "\n"
     if len(successes) > 0:
-        report_form += \
-            "| Successful Tests | Result | Start | Duration |\n" + \
-            "|------------------|--------|-------|----------|\n"
         report_form += "\n".join(successes)
-        report_form += "\n\n"
+        report_form += "\n"
     upload(job, buildnum, { "README.md" : report_form })
     if failed_tests:
         exit(1)
 
 if __name__ == "__main__":
+    load_config()
     run_tests()
