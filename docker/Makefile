@@ -19,9 +19,8 @@ credentials.yaml:
 	@echo "| Format is:"
 	@echo "|"
 	@echo "| jobname:"
-	@echo "|   user: username"
 	@echo "|   repo: orgname/reponame"
-	@echo "|   token: GitHub API Token"
+	@echo "|   key: private SSH key
 	@echo "|"
 	@echo "| Repeat for each workspace as needed."
 	@exit 1

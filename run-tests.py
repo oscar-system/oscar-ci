@@ -14,15 +14,14 @@ def read_credentials():
     except:
         pass
 
-def repo_url(job):
+def ssh_info(job):
     info = credentials[job]
     if info is None:
         return None
-    user = info["user"]
-    token = info["token"]
     repo = info["repo"]
-    url = "https://%s:%s@github.com/%s" % (user, token, repo)
-    return url
+    key = info["key"]
+    url = "ssh://git@github.com/%s" % repo
+    return (url, key)
 
 def mkpath(*args):
     import os
@@ -40,23 +39,21 @@ def git(*subcmd):
     return subprocess.run(cmd, stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL)
 
-def clone(job):
+def clone(url):
     import os, shutil
-    if job in credentials:
-        if os.path.exists("report"):
-            return
-        shutil.rmtree("report.tmp", ignore_errors=True)
-        git("!clone", repo_url(job), "report.tmp")
-        git("-C", "report.tmp", "config",
-            "--local", "user.email", "oscar@computeralgebra.de")
-        git("-C", "report.tmp", "config",
-            "--local", "user.name", "OSCAR Automation")
-        git("-C", "report.tmp", "reset", "--hard", "master")
-        shutil.move("report.tmp", "report")
+    if os.path.exists("report"):
+        return
+    shutil.rmtree("report.tmp", ignore_errors=True)
+    git("!clone", url, "report.tmp")
+    git("-C", "report.tmp", "config",
+        "--local", "user.email", "oscar@computeralgebra.de")
+    git("-C", "report.tmp", "config",
+        "--local", "user.name", "OSCAR Automation")
+    git("-C", "report.tmp", "reset", "--hard", "master")
+    shutil.move("report.tmp", "report")
 
-def push(job):
-    if job in credentials:
-        git("push", repo_url(job), "-f", "master")
+def push(url):
+    git("push", url, "-f", "master")
 
 def add_file(path, contents):
     with open(mkpath("report", path), "w") as outfile:
@@ -67,14 +64,23 @@ def commit(msg):
     git("commit", "-m", msg)
 
 def upload(job, build, files):
+    import os
     read_credentials()
     if job not in credentials:
         return
-    clone(job)
+    url, key = ssh_info(job)
+    keyfile = os.path.expanduser("~/.ssh_git_key." + job)
+    with open(keyfile, "w") as keyfp:
+      keyfp.write(key)
+    os.chmod(keyfile, 0o600)
+    os.environ["GIT_SSH_COMMAND"] = "ssh -o 'StrictHostKeyChecking no' -i " + keyfile
+    clone(url)
     for path, contents in files.items():
         add_file(path, contents)
     commit("Build " + str(build))
-    push(job)
+    push(url)
+    try: os.remove(keyfile)
+    except: pass
 
 # Test runner
 
