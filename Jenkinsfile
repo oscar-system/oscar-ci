@@ -144,7 +144,7 @@ node {
                             label: "Configure GAP (step 2)."
                         sh script: "make -j${jobs}",
                             label: "Build GAP."
-                        sh script: "test -d pkg || (make bootstrap-pkg-full && cd pkg && ../bin/BuildPackages.sh)",
+                        sh script: "${workspace}/meta/make-gap-pkgs",
                             label: "Build GAP packages."
 		        sh script: "ln -sf ${workspace}/gap/bin/gap.sh ${workspace}/local/bin/gap",
 		            label: "Install GAP."

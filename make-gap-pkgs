@@ -1,0 +1,16 @@
+#!/bin/bash
+cat <<'EOF' | make -f - install-pkg-smart
+include GNUmakefile
+
+install-pkg-smart:
+	wget -N --no-if-modified-since $(PKG_BOOTSTRAP_URL)$(PKG_FULL)
+	shasum $(PKG_FULL) >.sha.new
+	if ! diff .sha.old .sha.new 2>/dev/null >/dev/null; then \
+	rm -rf pkg && mkdir pkg && cd pkg && \
+	tar xzf ../$(PKG_FULL) && \
+	../bin/BuildPackages.sh && \
+	cd .. && shasum $(PKG_FULL) >.sha.old; \
+	fi
+
+.PHONY: install-pkg-smart
+EOF
