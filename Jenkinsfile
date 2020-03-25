@@ -79,6 +79,10 @@ node {
                     git url: "https://github.com/thofma/Hecke.jl",
                         branch: "master"
                 }
+                dir("LoadFlint.jl") {
+                    git url: "https://github.com/oscar-system/LoadFlint.jl",
+                        branch: "master"
+                }
                 dir("Singular.jl") {
                     git url: "https://github.com/oscar-system/Singular.jl",
                         branch: "master"

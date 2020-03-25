@@ -1,5 +1,5 @@
 packages = [
-  "GAP", "AbstractAlgebra", "Nemo", "Hecke",
+  "GAP", "AbstractAlgebra", "Nemo", "Hecke", "LoadFlint",
   "Singular", "Polymake", "HomalgProject", "Oscar"
 ]
 
