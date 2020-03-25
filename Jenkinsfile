@@ -25,12 +25,12 @@ node {
     // environment variables
     def stdenv = [
         "GAPROOT=${workspace}/gap",
-        "NEMO_SOURCE_BUILD=1",
         "NEMO_BUILD_THREADS=${jobs}",
         "JULIA_DEPOT_PATH=${workspace}/jenv/pkg",
         "JULIA_PROJECT=${workspace}/jenv/proj",
         "POLYMAKE_CONFIG=${workspace}/local/bin/polymake-config",
         "PATH=${workspace}/local/bin:${env.PATH}",
+        // "NEMO_SOURCE_BUILD=1",
     ]
     try {
         stage('Preparation') { // for display purposes
