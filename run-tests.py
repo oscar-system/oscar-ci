@@ -36,7 +36,8 @@ def git(*subcmd):
     elif subcmd[0] != "-C":
         cmd.extend(["-C", "report"])
     cmd.extend(subcmd)
-    result = subprocess.run(cmd, capture_output=True)
+    result = subprocess.run(cmd,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return result
 
 def clone(url):
