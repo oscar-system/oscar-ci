@@ -36,24 +36,27 @@ def git(*subcmd):
     elif subcmd[0] != "-C":
         cmd.extend(["-C", "report"])
     cmd.extend(subcmd)
-    return subprocess.run(cmd, stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL)
+    result = subprocess.run(cmd, capture_output=True)
+    return result
 
 def clone(url):
     import os, shutil
     if os.path.exists("report"):
-        return
-    shutil.rmtree("report.tmp", ignore_errors=True)
-    git("!clone", url, "report.tmp")
-    git("-C", "report.tmp", "config",
-        "--local", "user.email", "oscar@computeralgebra.de")
-    git("-C", "report.tmp", "config",
-        "--local", "user.name", "OSCAR Automation")
-    git("-C", "report.tmp", "reset", "--hard", "master")
-    shutil.move("report.tmp", "report")
+        git("remote", "set-url", "origin", url)
+        git("pull", "--ff-only", "origin", "master")
+    else:
+        shutil.rmtree("report.tmp", ignore_errors=True)
+        git("!clone", url, "report.tmp")
+        git("-C", "report.tmp", "config",
+            "--local", "user.email", "oscar@computeralgebra.de")
+        git("-C", "report.tmp", "config",
+            "--local", "user.name", "OSCAR Automation")
+        git("-C", "report.tmp", "reset", "--hard", "master")
+        shutil.move("report.tmp", "report")
 
 def push(url):
-    git("push", url, "-f", "master")
+    git("remote", "set-url", "origin", url)
+    git("push", "-f", "origin", "master")
 
 def add_file(path, contents):
     import os
