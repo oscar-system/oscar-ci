@@ -24,13 +24,11 @@ node {
 
     // environment variables
     def stdenv = [
-        "GAPROOT=${workspace}/gap",
         "NEMO_BUILD_THREADS=${jobs}",
         "JULIA_DEPOT_PATH=${workspace}/jenv/pkg",
         "JULIA_PROJECT=${workspace}/jenv/proj",
         "POLYMAKE_CONFIG=${workspace}/local/bin/polymake-config",
         "PATH=${workspace}/local/bin:${env.PATH}",
-        // "NEMO_SOURCE_BUILD=1",
     ]
     try {
         stage('Preparation') { // for display purposes
@@ -140,6 +138,7 @@ node {
                             label: "Install Polymake."
                     }
                 }
+		/* GAP is now built as part of the GAP.jl package.
                 dir("gap") {
                     withEnv(stdenv) {
                         sh script: "./autogen.sh",
@@ -154,6 +153,7 @@ node {
 		            label: "Install GAP."
                     }
                 }
+		*/
                 dir("singular") {
                     withEnv(stdenv) {
 		        sh script: "git clean -fdxq",
@@ -172,18 +172,16 @@ node {
                     sh script: "julia/julia meta/packages-${buildtype}.jl",
                         label: "Build OSCAR packages."
                 }
-		// install Oscar GAP packages
+		// install Oscar GAP packages and link gap script
 		withEnv(stdenv) {
 		    def GAP_jl_PATH = sh(returnStdout: true,
 			script: "julia meta/gappath.jl").trim()
+		    sh script: "ln -sf ${GAP_jl_PATH}/gap.sh ${workspace}/local/bin/gap",
+		        label: "Install gap script in bin directory"
 		    sh script: "sh meta/install-gap-pkg.sh ${workspace}/OscarForHomalg",
 			label: "Install OscarForHomalg package in GAP pkg folder"
 		    sh script: "sh meta/install-gap-pkg.sh ${workspace}/NemoLinearAlgebraForCAP",
 			label: "Install NemoLinearAlgebraForCAP package in GAP pkg folder"
-		    sh script: "sh meta/install-gap-pkg.sh ${GAP_jl_PATH}/pkg/JuliaInterface"
-			label: "Install GAPJulia packages from GAP.jl in GAP pkg folder (part 1)"
-		    sh script: "sh meta/install-gap-pkg.sh ${GAP_jl_PATH}/pkg/JuliaExperimental",
-			label: "Install GAPJulia packages from GAP.jl in GAP pkg folder (part 2)"
 		}
             } else {
                 // skip build stage

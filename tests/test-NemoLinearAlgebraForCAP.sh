@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-cd gap/pkg/NemoLinearAlgebraForCAP
+cd "$(julia meta/gappkgpath.jl)"/NemoLinearAlgebraForCAP
 export TERM="dumb"
 make test
 

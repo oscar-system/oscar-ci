@@ -1,3 +1,4 @@
 #!/bin/bash
-rm -f "$WORKSPACE/gap/pkg/`basename $1`"
-ln -s "$1" "$WORKSPACE/gap/pkg/"
+PKGDIR="$(julia meta/gappkgpath.jl)"
+rm -f "$PKGDIR"/`basename $1`
+ln -s "$1" "$PKGDIR/"

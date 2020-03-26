@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-cd gap/pkg/JuliaInterface
+cd "$(julia meta/gappkgpath.jl)"/JuliaInterface
 export TERM="dumb"
 # make test
-gap tst/testall.g
+gap --quitonbreak tst/testall.g

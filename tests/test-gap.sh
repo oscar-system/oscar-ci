@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
-cd gap
-./gap tst/testinstall.g
+export TERM=dumb
+gap --quitonbreak -c 'ReadGapRoot("tst/testinstall.g");'
