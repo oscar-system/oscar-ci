@@ -13,7 +13,7 @@ node {
     // URLs
     def metarepo = env.OSCAR_CI_REPO ?
       "${env.OSCAR_CI_REPO}" :
-      "file://${env.HOME}/develop/ci-meta"
+      "https://github.com/oscar-system/oscar-ci"
 
     // parameters
     def julia_version = "${params.JULIA_VERSION}"
