@@ -85,8 +85,10 @@ node {
                     git url: "https://github.com/oscar-system/Singular.jl",
                         branch: "master"
                 }
+		/*
                 sh script: "meta/patch-singular-jl.sh",
 		    label: "Make Singular.jl use local Singular installation."
+		*/
                 // Polymake
                 if (!fileExists("/.dockerenv")) {
                     // We are running outside a docker container, create
@@ -154,6 +156,7 @@ node {
                     }
                 }
 		*/
+		/* Singular is now built as part of the Singular.jl package
                 dir("singular") {
                     withEnv(stdenv) {
 		        sh script: "git clean -fdxq",
@@ -168,6 +171,7 @@ node {
                             label: "Install Singular."
                     }
                 }
+		*/
                 withEnv(stdenv) {
                     sh script: "julia/julia meta/packages-${buildtype}.jl",
                         label: "Build OSCAR packages."
