@@ -20,9 +20,11 @@ credentials.yaml:
 	@echo "|"
 	@echo "| jobname:"
 	@echo "|   repo: orgname/reponame"
-	@echo "|   key: private SSH key
+	@echo "|   key: private SSH key"
 	@echo "|"
-	@echo "| Repeat for each workspace as needed."
+	@echo "| Repeat for each job as needed."
+	@echo "|"
+	@echo "| See example-credentials.yaml for an example."
 	@exit 1
 
 
