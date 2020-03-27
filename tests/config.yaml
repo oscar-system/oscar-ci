@@ -1,7 +1,5 @@
 - name: CheckPackages
   script: test-packages.sh
-- name: OscarForHomalg
-  script: test-OscarForHomalg.sh
 - name: GAP
   script: test-gap.sh
 - name: GAP.jl
