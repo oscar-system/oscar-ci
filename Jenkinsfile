@@ -109,10 +109,6 @@ node {
                         branch: "master"
                 }
                 // GAP packages
-                dir("OscarForHomalg") {
-                    git url: "https://github.com/homalg-project/OscarForHomalg.git",
-                        branch: "master"
-                }
                 dir("NemoLinearAlgebraForCAP") {
                     git url: "https://github.com/sebastianpos/NemoLinearAlgebraForCAP",
                         branch: "master"
@@ -182,8 +178,6 @@ node {
 			script: "julia meta/gappath.jl").trim()
 		    sh script: "ln -sf ${GAP_jl_PATH}/gap.sh ${workspace}/local/bin/gap",
 		        label: "Install gap script in bin directory"
-		    sh script: "sh meta/install-gap-pkg.sh ${workspace}/OscarForHomalg",
-			label: "Install OscarForHomalg package in GAP pkg folder"
 		    sh script: "sh meta/install-gap-pkg.sh ${workspace}/NemoLinearAlgebraForCAP",
 			label: "Install NemoLinearAlgebraForCAP package in GAP pkg folder"
 		}
