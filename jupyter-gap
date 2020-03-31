@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+BASEDIR="$(realpath "$(dirname "$0")")"
+. "$BASEDIR/ipython-env/bin/activate"
+. "$BASEDIR/jupyter-env.sh"
+export PATH="$GAPROOT:$GAPROOT/pkg/JupyterKernel-1.3/bin:$PATH"
+jupyter nbconvert \
+  --ExecutePreprocessor.kernel_name=gap-4 \
+  --ExecutePreprocessor.timeout=600 \
+  --to rst \
+  --output-dir="$WORKSPACE/notebooks-out" \
+  --execute "$@"

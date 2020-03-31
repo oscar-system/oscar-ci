@@ -1,4 +1,5 @@
 // vim:set ft=groovy:
+
 parameters {
     string("JULIA_VERSION", defaultValue: "master")
     string("GAP_VERSION", defaultValue: "master")
@@ -113,6 +114,10 @@ node {
                     git url: "https://github.com/sebastianpos/NemoLinearAlgebraForCAP",
                         branch: "master"
                 }
+		dir("notebooks") {
+		    git url: "https://github.com/oscar-system/OSCARBinder",
+		        branch: "master"
+		}
             } else {
                 // skip preparation
 		echo "Skipping preparation stage."
@@ -171,6 +176,8 @@ node {
                 withEnv(stdenv) {
                     sh script: "julia/julia meta/packages-${buildtype}.jl",
                         label: "Build OSCAR packages."
+		    sh script: "${workspace}/meta/install-jupyter.sh",
+		        label: "Install Jupyter."
                 }
 		// install Oscar GAP packages and link gap script
 		withEnv(stdenv) {

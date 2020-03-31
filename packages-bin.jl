@@ -20,6 +20,7 @@ Singular = PackageSpec("Singular")
 Polymake = PackageSpec("Polymake")
 HomalgProject = PackageSpec("HomalgProject")
 Oscar = PackageSpec(path="Oscar.jl") # No binary package yet
+Cxx = PackageSpec("Cxx")
 
 PkgAdd(GAP)
 PkgAdd(AbstractAlgebra)
@@ -30,6 +31,7 @@ PkgAdd(Singular)
 PkgAdd(Polymake)
 PkgAdd(HomalgProject)
 Pkg.add(Oscar)
+Pkg.add(Cxx)
 
 try
   Pkg.update()

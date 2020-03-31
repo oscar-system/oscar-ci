@@ -140,7 +140,7 @@ def make_job_url(buildnum):
     return url
 
 def run_tests():
-    import sys, os, subprocess, datetime, yaml
+    import sys, os, subprocess, datetime, yaml, re
     # Initialize variables
     failed_tests = False
     buildnum = os.environ.get("BUILD_NUMBER", "0")
@@ -170,14 +170,15 @@ def run_tests():
         # Retrieve information about this test.
         testscript = "meta/tests/" + test["script"]
         testname = test["name"]
+        testfilename = re.sub("[^-._a-zA-Z0-9]+", "-", testname)
         info = {}
         info["name"] = testname
         if "timeout" in test:
             timeout = test["timeout"]
         else:
             timeout = default_timeout
-        logfile = os.path.join(logdir, testname + ".log")
-        info["log"] = "%s/%s.log" % (log_url, testname)
+        logfile = os.path.join(logdir, testfilename + ".log")
+        info["log"] = "%s/%s.log" % (log_url, testfilename)
         def log(s):
             with open(logfile, "ab") as logfp:
                 if type(s) == type(u""):
@@ -260,7 +261,7 @@ def run_tests():
         # Log test results
         testsummary = "| %s | %s [%s](%s) | %s | %s | %s | %s |" % \
             (testname, statuscode, verbose_status.lower().capitalize(),
-             log_url + "/" + testname + ".log", start_short,
+             log_url + "/" + testfilename + ".log", start_short,
              "%d seconds" % duration, last_success, first_failure)
         report(testsummary, exitcode)
         testdata.append(info)
