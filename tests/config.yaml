@@ -25,15 +25,15 @@
   script: test-oscar.sh
 - name: NemoLinearAlgebraForCAP
   script: test-NemoLinearAlgebraForCAP.sh
-- name: "Jupyter: AbstractAlgebra"
+- name: AbstractAlgebra.ipynb
   script: test-JupyterAbsAlg.sh
-- name: "Jupyter: CohP1"
+- name: CohP1.ipynb
   script: test-JupyterCohP1.sh
-- name: "Jupyter: Hecke"
+- name: Hecke.ipynb
   script: test-JupyterHecke.sh
-- name: "Jupyter: Polymake"
+- name: Polymake.ipynb
   script: test-JupyterPolymake.sh
-- name: "Jupyter: Singular"
+- name: Singular.ipynb
   script: test-JupyterSingular.sh
-- name: "Jupyter: g-vectors"
+- name: g-vectors.ipynb
   script: test-Jupyter-g-vectors.sh
