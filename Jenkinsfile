@@ -10,6 +10,7 @@ parameters {
 }
 
 node {
+    def lastBuildFile = ".lastBuild"
     def workspace = pwd()
     // URLs
     def metarepo = env.OSCAR_CI_REPO ?
@@ -31,11 +32,22 @@ node {
         "POLYMAKE_CONFIG=${workspace}/local/bin/polymake-config",
         "PATH=${workspace}/local/bin:${env.PATH}",
     ]
+
     try {
+	// Do a full rebuild every day after midnight
+	def date = new Date().format("yyyy-MM-dd")
+	try {
+	    olddate = readFile(file: lastBuildFile)
+	    if (olddate != date)
+		rebuild = "full"
+	} catch (all) {
+	    rebuild = "full"
+	}
         stage('Preparation') { // for display purposes
             if (rebuild == "full") {
                 cleanWs disableDeferredWipeout: true, deleteDirs: true
             }
+	    writeFile(file: lastBuildFile, text: date)
 	    // Get some code from a GitHub repository
 	    dir("meta") {
 		git url: metarepo,
