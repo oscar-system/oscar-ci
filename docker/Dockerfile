@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y \
   libpcre2-dev \
   libperl-dev \
   libreadline-dev \
+  libsvg-perl \
   libterm-readkey-perl \
   libterm-readline-gnu-perl \
   libtool-bin \

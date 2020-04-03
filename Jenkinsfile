@@ -118,6 +118,10 @@ node {
 		    git url: "https://github.com/oscar-system/OSCARBinder",
 		        branch: "master"
 		}
+		dir("notebooks-polymake") {
+		    git url: "https://github.com/micjoswig/oscar-notebooks",
+		        branch: "master"
+		}
             } else {
                 // skip preparation
 		echo "Skipping preparation stage."

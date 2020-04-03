@@ -34,6 +34,7 @@ popd >/dev/null
 export PATH="$PREFIX/bin:$PATH"
 
 cpan -T JSON
+cpain -T SVG
 cpan XML::LibXML XML::LibXSLT
 cpan XML::Writer XML::Reader
 cpan -T Term::ReadKey Term::ReadLine::Gnu
