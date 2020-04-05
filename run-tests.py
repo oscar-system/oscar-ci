@@ -298,7 +298,7 @@ class TestRunner:
     def finish(self):
         import yaml
         def reindex(l):
-            l.sort()
+            l.sort(key = lambda a: a[0])
             l[:] = [ item for index, item in l ]
         print("Logs: " + self.log_url + "/")
         # Print a human readable report
@@ -329,18 +329,24 @@ class TestRunner:
             }, default_flow_style=False)
         })
 
-def run_tests(tests):
+def run_tests(config):
     import sys
+    tests = config["tests"]
+    parallelize = config["parallelize"]
     testrunner = TestRunner()
-    tasks = [ testrunner.start(test, index)
-        for index, test in zip(range(len(tests)), tests) ]
-    for task in tasks:
-        print(task.result())
-        sys.stdout.flush()
+    if parallelize:
+        tasks = [ testrunner.start(test, index)
+            for index, test in zip(range(len(tests)), tests) ]
+        for task in tasks:
+            print(task.result())
+            sys.stdout.flush()
+    else:
+        for test in tests:
+            testrunner.run(test)
     testrunner.finish()
     if testrunner.failed_tests:
         exit(1)
 
 if __name__ == "__main__":
-    tests = load_config()
-    run_tests(tests)
+    config = load_config()
+    run_tests(config)

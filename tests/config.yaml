@@ -1,3 +1,12 @@
+# parallelize: Whether to run tests in parallel.
+# tests: Array of records with fields:
+# name: Human readable name of the test.
+# script: Filename of a shell script in the tests/ directory that
+#   runs the tests. File must be executable.
+# timeout: Time in seconds after which the test will be forcibly aborted.
+# after: Run this test after another test with which it may conflict.
+parallelize: false
+tests:
 - name: CheckPackages
   script: test-packages.sh
 - name: GAP
