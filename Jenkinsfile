@@ -30,6 +30,7 @@ node {
         "JULIA_DEPOT_PATH=${workspace}/jenv/pkg",
         "JULIA_PROJECT=${workspace}/jenv/proj",
         "POLYMAKE_CONFIG=${workspace}/local/bin/polymake-config",
+        "POLYMAKE_USER_DIR=${workspace}/.polymake-default",
         "PATH=${workspace}/local/bin:${env.PATH}",
     ]
 

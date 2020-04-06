@@ -145,6 +145,7 @@ class TestRunner:
         self.failed_tests = False
         self.buildnum = os.environ.get("BUILD_NUMBER", "0")
         self.jenkins_home = os.environ["JENKINS_HOME"]
+        self.workspace = os.environ["WORKSPACE"]
         self.job = os.environ["JOB_NAME"]
         self.build_url = os.environ["BUILD_URL"]
         self.maxjobs = int(os.environ.get("BUILDJOBS", 4))
@@ -198,7 +199,10 @@ class TestRunner:
             log("=== %s (%s) at %s\n" % (testname, testscript, start))
             cmd = testscript
             cmd += " >>" + logfile + " 2>&1"
-            result = subprocess.run(cmd, shell=True, timeout = timeout)
+            polymake_user_dir = mkpath(self.workspace, ".polymake",
+                testfilename)
+            result = subprocess.run(cmd, shell=True, timeout = timeout,
+                env = { **os.environ, "POLYMAKE_USER_DIR": polymake_user_dir})
             exitcode = result.returncode
             if exitcode == 0:
                 verbose_status = "SUCCESS"
