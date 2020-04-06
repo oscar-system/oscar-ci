@@ -127,9 +127,8 @@ class YamlDB(dict):
 
 def load_config():
     import yaml
-    global tests
     with open("meta/tests/config.yaml") as config:
-        tests = yaml.safe_load(config.read())
+        return yaml.safe_load(config.read())
 
 def make_job_url(buildnum):
     import os
@@ -139,34 +138,37 @@ def make_job_url(buildnum):
     url += "job/%s/%s/" % (job, buildnum)
     return url
 
-def run_tests():
-    import sys, os, subprocess, datetime, yaml, re
-    # Initialize variables
-    failed_tests = False
-    buildnum = os.environ.get("BUILD_NUMBER", "0")
-    jenkins_home = os.environ["JENKINS_HOME"]
-    job = os.environ["JOB_NAME"]
-    build_url = os.environ["BUILD_URL"]
-    if not build_url.endswith("/"): build_url += "/"
-    log_url = build_url + "artifact/logs/build-" + buildnum
-    proj_url = build_url + "jenv/proj"
-    logdir = "logs/build-%s" % buildnum
-    start_date = None
-    end_date = None
-    # Report builder
-    successes = []
-    failures = []
-    testdata = []
-    def report(s, exitcode):
+class TestRunner:
+    def __init__(self):
+        # Init instance variables
+        import os, threading, concurrent.futures as futures
+        self.failed_tests = False
+        self.buildnum = os.environ.get("BUILD_NUMBER", "0")
+        self.jenkins_home = os.environ["JENKINS_HOME"]
+        self.job = os.environ["JOB_NAME"]
+        self.build_url = os.environ["BUILD_URL"]
+        self.maxjobs = int(os.environ.get("BUILDJOBS", 4))
+        if not self.build_url.endswith("/"): self.build_url += "/"
+        self.log_url = self.build_url + "artifact/logs/build-" + self.buildnum
+        self.logdir = "logs/build-%s" % self.buildnum
+        self.start_date = None
+        self.end_date = None
+        self.successes = []
+        self.failures = []
+        self.testresults = []
+        self.lock = threading.Lock()
+        self.threadpool = futures.ThreadPoolExecutor(max_workers=self.maxjobs)
+        self.futures = {}
+        # Create log dir for this build
+        try: os.makedirs(self.logdir, exist_ok=True)
+        except: pass
+    def report(self, msg, index, exitcode):
         if exitcode == 0:
-            successes.append(s)
+            self.successes.append((index, msg))
         else:
-            failures.append(s)
-    # Create log dir for this build
-    try: os.makedirs(logdir, exist_ok=True)
-    except: pass
-    # Iterate over all tests
-    for test in tests:
+            self.failures.append((index, msg))
+    def _run(self, test, index = 0):
+        import os, subprocess, datetime, yaml, re
         # Retrieve information about this test.
         testscript = "meta/tests/" + test["script"]
         testname = test["name"]
@@ -177,8 +179,8 @@ def run_tests():
             timeout = test["timeout"]
         else:
             timeout = default_timeout
-        logfile = os.path.join(logdir, testfilename + ".log")
-        info["log"] = "%s/%s.log" % (log_url, testfilename)
+        logfile = os.path.join(self.logdir, testfilename + ".log")
+        info["log"] = "%s/%s.log" % (self.log_url, testfilename)
         def log(s):
             with open(logfile, "ab") as logfp:
                 if type(s) == type(u""):
@@ -187,8 +189,9 @@ def run_tests():
         # Run the test and record its status
         try:
             start_time = datetime.datetime.now()
-            if start_date is None:
-                start_date = start_time.strftime("%Y-%m-%d")
+            with self.lock:
+                if self.start_date is None:
+                    self.start_date = start_time.strftime("%Y-%m-%d")
             start = start_time.strftime("%Y-%m-%d %H:%M")
             info["start"] = start
             start_short = start_time.strftime("%H:%M")
@@ -213,7 +216,8 @@ def run_tests():
             verbose_status = "INTERNAL ERROR"
             statuscode = "\u2049"
             exitcode = -1
-        failed_tests = failed_tests or exitcode != 0
+        with self.lock:
+            self.failed_tests = self.failed_tests or exitcode != 0
         info["success"] = (exitcode == 0)
         info["exitcode"] = exitcode
         info["status"] = verbose_status.lower()
@@ -222,80 +226,121 @@ def run_tests():
         # Timing information
         stop_time = datetime.datetime.now()
         stop = stop_time.strftime("%Y-%m-%d %H:%M")
-        if end_date is None:
-            end_date = stop_time.strftime("%Y-%m-%d")
+        with self.lock:
+            new_end_date = stop_time.strftime("%Y-%m-%d")
+            if self.end_date is None or new_end_date > self.end_date:
+                self.end_date = new_end_date
         duration = (stop_time - start_time).seconds
         info["duration"] = duration
         # Make a persistent record of the last success/first failure
-        jobstate_dir = jenkins_home + "/jobstate"
-        jobstate = mkpath(jobstate_dir, job + ".yaml")
+        jobstate_dir = self.jenkins_home + "/jobstate"
+        jobstate = mkpath(jobstate_dir, self.job + ".yaml")
         os.makedirs(jobstate_dir, exist_ok=True)
-        db = YamlDB(jobstate)
-        info["last_success"] = False
-        info["last_success_url"] = None
-        info["first_failure"] = False
-        info["first_failure_url"] = None
-        if exitcode == 0:
-            last_success = ""
-            first_failure = ""
-            db[testname] = [ buildnum, "" ]
-        else:
-            if testname in db:
-                if db[testname][1] == "":
-                    db[testname][1] = buildnum
+        with self.lock:
+            db = YamlDB(jobstate)
+            info["last_success"] = False
+            info["last_success_url"] = None
+            info["first_failure"] = False
+            info["first_failure_url"] = None
+            if exitcode == 0:
+                last_success = ""
+                first_failure = ""
+                db[testname] = [ self.buildnum, "" ]
             else:
-                db[testname] = [ "", buildnum ]
-            if db[testname][0] == "":
-                last_success = "unknown"
-                first_failure = "unknown"
-            else:
-                err = db[testname]
-                url = [ make_job_url(str(n)) for n in err ]
-                last_success = "[%s](%s)" % (err[0], url[0])
-                first_failure = "[%s](%s)" % (err[1], url[1])
-                info["last_success"] = int(err[0])
-                info["last_success_url"] = url[0]
-                info["first_failure"] = int(err[1])
-                info["first_failure_url"] = url[1]
-        db.close()
+                if testname in db:
+                    if db[testname][1] == "":
+                        db[testname][1] = self.buildnum
+                else:
+                    db[testname] = [ "", self.buildnum ]
+                if db[testname][0] == "":
+                    last_success = "unknown"
+                    first_failure = "unknown"
+                else:
+                    err = db[testname]
+                    url = [ make_job_url(str(n)) for n in err ]
+                    last_success = "[%s](%s)" % (err[0], url[0])
+                    first_failure = "[%s](%s)" % (err[1], url[1])
+                    info["last_success"] = int(err[0])
+                    info["last_success_url"] = url[0]
+                    info["first_failure"] = int(err[1])
+                    info["first_failure_url"] = url[1]
+            db.close()
         # Log test results
         testsummary = "| %s | %s [%s](%s) | %s | %s | %s | %s |" % \
             (testname, statuscode, verbose_status.lower().capitalize(),
-             log_url + "/" + testfilename + ".log", start_short,
+             self.log_url + "/" + testfilename + ".log", start_short,
              "%d seconds" % duration, last_success, first_failure)
-        report(testsummary, exitcode)
-        testdata.append(info)
+        with self.lock:
+            self.report(testsummary, index, exitcode)
+            self.testresults.append((index, info))
         log("=== %s at %s\n" % (verbose_status, stop))
-        print("Testing: %-19s at %s => %s" % (testname, start, verbose_status))
+        return "Testing: %-19s at %s => %s" % (testname, start, verbose_status)
+    def run(self, test):
+        import sys
+        msg = self._run(test)
+        print(msg)
         sys.stdout.flush()
-    print("Logs: " + log_url + "/")
-    # Print a human readable report
-    report_form = ""
-    report_form += "## [Build %s](%s)\n\n" % (buildnum, build_url)
-    report_form += "* Started on: %s\n" % start_date
-    report_form += "* Ended on: %s\n\n" % end_date
-    report_form += \
-        "| Test Name    | Result | Start | Duration | Last Success | First Failure |\n" + \
-        "|:-------------|:-------|:------|:---------|:-------------|:--------------|\n"
-    if len(failures) > 0:
-        report_form += "\n".join(failures)
-        report_form += "\n"
-    if len(successes) > 0:
-        report_form += "\n".join(successes)
-        report_form += "\n"
-    # Dump report into a yaml file
-    upload(job, buildnum, {
-        "README.md" : report_form,
-        "_data/ci.yml" : yaml.dump({
-            "build": int(buildnum),
-            "build_url": build_url,
-            "job": job,
-            "tests": testdata
-        }, default_flow_style=False)
-    })
-    if failed_tests:
+    def _start(self, test, index):
+        after = test.get("after", None)
+        dep = self.futures.get(after, None)
+        if after is not None and dep is None:
+            print("Warning: Invalid dependency %s => %s" % (test["name"],
+                    after))
+        else:
+            if dep is not None:
+                self.futures[after].result()
+        return self._run(test, index)
+    def start(self, test, index=0):
+        with self.lock:
+            future = self.threadpool.submit(self._start, test, index)
+            self.futures[test["name"]] = future
+            return future
+    def finish(self):
+        import yaml
+        def reindex(l):
+            l.sort()
+            l[:] = [ item for index, item in l ]
+        print("Logs: " + self.log_url + "/")
+        # Print a human readable report
+        report_form = ""
+        report_form += "## [Build %s](%s)\n\n" % (self.buildnum, self.build_url)
+        report_form += "* Started on: %s\n" % self.start_date
+        report_form += "* Ended on: %s\n\n" % self.end_date
+        report_form += \
+            "| Test Name    | Result | Start | Duration | Last Success | First Failure |\n" + \
+            "|:-------------|:-------|:------|:---------|:-------------|:--------------|\n"
+        reindex(self.failures)
+        reindex(self.successes)
+        reindex(self.testresults)
+        if len(self.failures) > 0:
+            report_form += "\n".join(self.failures)
+            report_form += "\n"
+        if len(self.successes) > 0:
+            report_form += "\n".join(self.successes)
+            report_form += "\n"
+        # Dump report into a yaml file
+        upload(self.job, self.buildnum, {
+            "README.md" : report_form,
+            "_data/ci.yml" : yaml.dump({
+                "build": int(self.buildnum),
+                "build_url": self.build_url,
+                "job": self.job,
+                "tests": self.testresults
+            }, default_flow_style=False)
+        })
+
+def run_tests(tests):
+    import sys
+    testrunner = TestRunner()
+    tasks = [ testrunner.start(test, index)
+        for index, test in zip(range(len(tests)), tests) ]
+    for task in tasks:
+        print(task.result())
+        sys.stdout.flush()
+    testrunner.finish()
+    if testrunner.failed_tests:
         exit(1)
 
 if __name__ == "__main__":
-    load_config()
-    run_tests()
+    tests = load_config()
+    run_tests(tests)
