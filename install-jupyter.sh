@@ -3,7 +3,7 @@ set -e
 BASEDIR="$(realpath "$(dirname "$0")")"
 python3 -m venv "$BASEDIR/ipython-env"
 . "$BASEDIR/ipython-env/bin/activate"
-pip install jupyter notebook
+pip install --cache-dir "$WORKSPACE/.pip-cache" jupyter notebook
 . "$BASEDIR/jupyter-env.sh"
 julia meta/install-jupyter.jl
 # The IJulia kernel starts up with --project=@., which is not what we
