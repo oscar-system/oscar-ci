@@ -19,8 +19,7 @@ LoadFlint = PackageSpec("LoadFlint")
 Singular = PackageSpec("Singular")
 Polymake = PackageSpec("Polymake")
 HomalgProject = PackageSpec("HomalgProject")
-Oscar = PackageSpec(path="Oscar.jl") # No binary package yet
-Cxx = PackageSpec("Cxx")
+Oscar = PackageSpec(path="Oscar.jl") # Oscar still needs to be from master
 
 PkgAdd(GAP)
 PkgAdd(AbstractAlgebra)
@@ -31,7 +30,6 @@ PkgAdd(Singular)
 PkgAdd(Polymake)
 PkgAdd(HomalgProject)
 Pkg.add(Oscar)
-Pkg.add(Cxx)
 
 try
   Pkg.update()

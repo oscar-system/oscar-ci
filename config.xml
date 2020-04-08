@@ -21,11 +21,11 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>BUILDTYPE</name>
-          <description>Build source or binary builder version.</description>
+          <description>Build master branch or stable version of packages.</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
-              <string>src</string>
-              <string>bin</string>
+              <string>master</string>
+              <string>stable</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>

@@ -169,7 +169,7 @@ class TestRunner:
         else:
             self.failures.append((index, msg))
     def _run(self, test, index = 0):
-        import os, subprocess, datetime, yaml, re
+        import os, subprocess, datetime, yaml, re, shutil
         # Retrieve information about this test.
         testscript = "meta/tests/" + test["script"]
         testname = test["name"]
@@ -201,6 +201,8 @@ class TestRunner:
             cmd += " >>" + logfile + " 2>&1"
             polymake_user_dir = mkpath(self.workspace, ".polymake",
                 testfilename)
+            shutil.rmtree(polymake_user_dir, ignore_errors=True)
+            os.makedirs(polymake_user_dir, exist_ok=True)
             result = subprocess.run(cmd, shell=True, timeout = timeout,
                 env = { **os.environ, "POLYMAKE_USER_DIR": polymake_user_dir})
             exitcode = result.returncode

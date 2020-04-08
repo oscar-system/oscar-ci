@@ -1,4 +1,4 @@
-extra_packages = [ "ImplicitPlots", "Plots", "HomotopyContinuation" ]
+extra_packages = [ "Cxx", "ImplicitPlots", "Plots", "HomotopyContinuation" ]
 
 using Pkg
 Pkg.add("IJulia")
