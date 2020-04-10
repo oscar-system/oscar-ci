@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
-BASEDIR="$(realpath "$(dirname "$0")")"
-. "$BASEDIR/ipython-env/bin/activate"
-. "$BASEDIR/jupyter-env.sh"
+source meta/stdenv.sh
+source jupyter/ipython-env/bin/activate
+source meta/jupyter-env.sh
 JULIA_KERNEL=$(jupyter kernelspec list | awk '{print $1}' | egrep julia)
 jupyter nbconvert \
   --ExecutePreprocessor.kernel_name=$JULIA_KERNEL \
