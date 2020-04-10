@@ -198,9 +198,9 @@ node {
                 }
 		// install Oscar GAP packages and link gap script
 		withEnv(stdenv) {
-		    def GAP_jl_PATH = sh(returnStdout: true,
+		    def GAP_PATH = sh(returnStdout: true,
 			script: "julia meta/gappath.jl").trim()
-		    sh script: "ln -sf ${GAP_jl_PATH}/gap.sh ${workspace}/local/bin/gap",
+		    sh script: "ln -sf ${GAP_PATH} ${workspace}/local/bin/gap",
 		        label: "Install gap script in bin directory"
 		    sh script: "sh meta/install-gap-pkg.sh ${workspace}/NemoLinearAlgebraForCAP",
 			label: "Install NemoLinearAlgebraForCAP package in GAP pkg folder"

@@ -1,1 +1,2 @@
-print(normpath(joinpath(dirname(Base.find_package("GAP")), "../pkg")))
+using GAP
+print(string(GAP.EvalString("Filename(DirectoriesLibrary(\"pkg\")[1],\"\")")))

@@ -1,1 +1,2 @@
-print(normpath(joinpath(dirname(Base.find_package("GAP")), "..")))
+using GAP
+print(GAP.gap_exe())
