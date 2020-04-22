@@ -64,8 +64,8 @@ def add_file(path, contents):
     dir = os.path.dirname(path)
     if dir != "":
         os.makedirs(mkpath("report", dir), exist_ok=True)
-    with open(mkpath("report", path), "w") as outfile:
-        outfile.write(contents)
+    with open(mkpath("report", path), "wb") as outfile:
+        outfile.write(contents.encode())
     git("add", path)
 
 def commit(msg):
@@ -185,7 +185,7 @@ class TestRunner:
         def log(s):
             with open(logfile, "ab") as logfp:
                 if type(s) == type(u""):
-                    s = bytearray(s, "utf-8")
+                    s = s.encode()
                 logfp.write(s)
         # Run the test and record its status
         try:
