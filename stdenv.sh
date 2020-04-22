@@ -4,3 +4,5 @@ export POLYMAKE_CONFIG="${WORKSPACE}/local/bin/polymake-config"
 export POLYMAKE_USER_DIR="${WORKSPACE}/.polymake-default"
 export PATH="${WORKSPACE}/local/bin:${PATH}"
 export JUPYTER_BASE="${WORKSPACE}/jupyter"
+export LC_ALL=C
+export TERM=dumb
