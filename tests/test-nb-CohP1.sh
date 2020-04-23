@@ -1,3 +1,3 @@
 #!/bin/bash
 set -e
-meta/jupyter-julia notebooks/CohP1.ipynb
+meta/check-julia-notebook notebooks/CohP1.ipynb

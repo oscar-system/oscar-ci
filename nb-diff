@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+import sys, json, difflib, re
+
+_fold_ws = False
+_args = sys.argv[1:]
+if len(_args) < 2:
+  print("nb-diff: too few arguments")
+  exit(1)
+if _args[0] == "-w":
+  _fold_ws = True
+  del _args[0]
+file1, file2 = _args[0:2]
+
+
+
+def filter_output(output):
+  if "image/svg+xml" in output["data"]:
+    del output["data"]["image/svg+xml"]
+  return { "data": output["data"], "output_type": output["output_type"] }
+
+def filter_outputs(outputs):
+  return [
+    filter_output(output)
+      for output in outputs
+      if output["output_type"] in [ "execute_result", "display_data" ]
+  ]
+
+
+def filter_cell(cell):
+    return {
+      "cell_type": cell["cell_type"],
+      "source": cell["source"],
+      "outputs": filter_outputs(cell["outputs"]),
+    }
+
+_ws = re.compile(r"\s+")
+_ws_trail = re.compile(r"\s+(\\n|$)")
+_ws_start = re.compile(r"^\s+")
+
+def fold_ws_str(s):
+  s = _ws.sub(" ", s)
+  if s.startswith(" "):
+    s = s[1:]
+  if s.endswith(" \\n"):
+    s = s[:-2] + "\\n"
+  elif s.endswith(" "):
+    s = s[:-1]
+  return s
+
+def fold_ws(d):
+  t = type(d)
+  if t is str:
+    return fold_ws_str(d)
+  elif t is list:
+    return [ fold_ws(el) for el in d ]
+  elif t is dict:
+    return { fold_ws(k):fold_ws(v) for (k, v) in d.items() }
+  else:
+    return d
+
+def filter_file(file):
+  with open(file) as fp:
+    cells = json.load(fp)
+  cells = {
+    "cells": [
+        filter_cell(cell)
+          for cell in cells["cells"]
+          if cell["cell_type"] == "code"
+    ]
+  }
+  if _fold_ws:
+    cells = fold_ws(cells)
+  return [ line + "\n" for line in json.dumps(cells, indent=2).split("\n") ]
+
+a = filter_file(file1)
+b = filter_file(file2)
+status = 0
+for line in difflib.context_diff(a, b, fromfile=file1, tofile=file2):
+  sys.stdout.write(line)
+  status = 1
+exit(status)

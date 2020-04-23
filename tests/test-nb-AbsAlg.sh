@@ -1,3 +1,3 @@
 #!/bin/bash
 set -e
-meta/jupyter-julia notebooks/AbstractAlgebra.ipynb
+meta/check-julia-notebook notebooks/AbstractAlgebra.ipynb

@@ -1,3 +1,3 @@
 #!/bin/bash
 set -e
-meta/jupyter-julia notebooks-polymake/polymake/g-vectors_of_random_simplicial_6-polytopes.ipynb
+meta/check-julia-notebook notebooks-polymake/polymake/g-vectors_of_random_simplicial_6-polytopes.ipynb

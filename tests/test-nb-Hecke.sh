@@ -1,3 +1,3 @@
 #!/bin/bash
 set -e
-meta/jupyter-julia notebooks/Hecke.ipynb
+meta/check-julia-notebook notebooks/Hecke.ipynb
