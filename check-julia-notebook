@@ -4,4 +4,4 @@ meta/jupyter-julia "$1"
 echo "=== notebook diff for $(basename "$1")"
 export LC_ALL=en_US.UTF-8
 # Temporarily silence errors
-meta/nb-diff "$1" "notebooks-out/$(basename "$1")" || true
+meta/nb-diff -w "$1" "notebooks-out/$(basename "$1")" || true
