@@ -77,8 +77,6 @@ node {
 		    branch: julia_version
 		get url: "https://github.com/gap-system/gap",
 		    branch: gap_version
-		get url: "https://github.com/polymake/polymake",
-		    branch: "Releases"
 		get url: "https://github.com/singular/sources",
 		    dir: "singular", branch: "spielwiese"
 		get url: "https://github.com/oscar-system/GAP.jl"
@@ -103,7 +101,6 @@ node {
         stage('Build') {
             if (rebuild != "none") {
 	        sh "meta/install/install-julia.sh"
-		sh "meta/install/install-polymake.sh"
 		sh "meta/install/install-oscar.sh"
 		sh "meta/install/install-jupyter.sh"
 		sh "meta/install/install-gap.sh"

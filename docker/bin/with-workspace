@@ -13,7 +13,6 @@ if [ -d "$WORKSPACE" ]; then
   export NEMO_SOURCE_BUILD=1
   export JULIA_DEPOT_PATH="$WORKSPACE/jenv/pkg"
   export JULIA_PROJECT="$WORKSPACE/jenv/proj"
-  export POLYMAKE_CONFIG="$WORKSPACE/local/bin/polymake-config"
   export PATH="$WORKSPACE/local/bin:$PATH"
   cd $WORKSPACE
   exec "$@"
