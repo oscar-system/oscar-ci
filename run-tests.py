@@ -174,8 +174,10 @@ class TestRunner:
         testscript = "meta/tests/" + test["script"]
         testname = test["name"]
         testfilename = re.sub("[^-._a-zA-Z0-9]+", "-", testname)
+        testid = re.sub("[^a-zA-Z0-9]+", "-", testname).lower()
         info = {}
         info["name"] = testname
+        info["id"] = testid
         if "timeout" in test:
             timeout = test["timeout"]
         else:
