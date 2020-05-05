@@ -1,3 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
-julia/julia -e 'using Pkg; Pkg.test("Hecke");'
+source meta/stdenv.sh
+linebuf julia -e 'using Pkg; Pkg.test("Hecke");'

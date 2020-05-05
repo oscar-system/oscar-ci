@@ -10,4 +10,4 @@ source meta/stdenv.sh
 #   mv -f .pkgstatus.tmp .pkgstatus
 # fi
 rm -rf jenv
-julia "meta/install/install-oscar.jl"
+linebuf julia "meta/install/install-oscar.jl"
