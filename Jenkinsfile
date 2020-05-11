@@ -87,6 +87,7 @@ node {
                 get url: "https://github.com/oscar-system/Singular.jl"
 		get url: "https://github.com/oscar-system/Polymake.jl"
 		get url: "https://github.com/homalg-project/HomalgProject.jl"
+		get url: "https://github.com/oscar-system/GroupAtlas.jl"
 		get url: "https://github.com/oscar-system/Oscar.jl"
                 get url: "https://github.com/sebastianpos/NemoLinearAlgebraForCAP"
 		get url: "https://github.com/oscar-system/OSCARBinder",

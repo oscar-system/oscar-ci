@@ -2,7 +2,7 @@ using Pkg
 
 packages = [
   "GAP", "AbstractAlgebra", "Nemo", "Hecke", "LoadFlint",
-  "Singular", "Polymake", "HomalgProject", "Oscar"
+  "Singular", "Polymake", "HomalgProject", "GroupAtlas", "Oscar"
 ]
 
 build_type = get(ENV, "BUILDTYPE", "master")

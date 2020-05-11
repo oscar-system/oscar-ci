@@ -1,6 +1,6 @@
 packages = [
   "GAP", "AbstractAlgebra", "Nemo", "Hecke", "LoadFlint",
-  "Singular", "Polymake", "HomalgProject", "Oscar"
+  "Singular", "Polymake", "HomalgProject", "GroupAtlas", "Oscar"
 ]
 
 failed = []

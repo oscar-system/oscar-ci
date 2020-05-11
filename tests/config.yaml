@@ -26,6 +26,8 @@ tests:
   script: test-HomalgProject_jl.sh
 - name: Polymake.jl
   script: test-polymakejl.sh
+- name: GroupAtlas.jl
+  script: test-GroupAtlas_jl.sh
 - name: JuliaInterface
   script: test-JuliaInterface.sh
 - name: JuliaExperimental
