@@ -96,6 +96,8 @@ node {
 		        dir: "notebooks-polymake"
 		get url: "https://github.com/homalg-project/CapHomalgNotebooks",
 		        dir: "notebooks-homalg"
+		get url: "https://github.com/oscar-system/GITFans",
+		        dir: "notebooks-gitfans"
             } else {
                 // skip preparation
 		echo "Skipping preparation stage."

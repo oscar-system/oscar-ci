@@ -1,6 +1,9 @@
-extra_packages = [ "Cxx", "ImplicitPlots", "Plots", "HomotopyContinuation" ]
-
 using Pkg
+extra_packages = [
+  "Cxx", "ImplicitPlots", "Plots", "HomotopyContinuation",
+  PackageSpec(path="notebooks-gitfans")
+]
+
 Pkg.add("IJulia")
 Pkg.build("IJulia")
 

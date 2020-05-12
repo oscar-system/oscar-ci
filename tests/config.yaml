@@ -67,4 +67,6 @@ tests:
 - name: "uMPS(2,2,4)_0dim.ipynb"
   script: test-nb-umps.sh
   timeout: 300
-  after: HomalgProject.jl
+- name: GITFans.ipynb
+  script: test-nb-gitfans.sh
+  timeout: 300
