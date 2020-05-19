@@ -1,12 +1,21 @@
 using Pkg
-extra_packages = [
-  "Cxx", "ImplicitPlots", "Plots", "HomotopyContinuation",
-  PackageSpec(path="notebooks-gitfans")
-]
+
+include("../packages.jl")
+
+function SafeAdd(name)
+  try
+    Pkg.add(name)
+  catch
+    for (exception, backtrace) in Base.catch_stack()
+      showerror(stdout, exception, backtrace)
+      println()
+    end
+  end
+end
 
 Pkg.add("IJulia")
 Pkg.build("IJulia")
 
-for pkg in extra_packages
-  Pkg.add(pkg)
+for pkg in notebook_packages
+  SafeAdd(pkg)
 end

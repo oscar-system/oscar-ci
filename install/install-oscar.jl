@@ -1,14 +1,11 @@
 using Pkg
 
-packages = [
-  "GAP", "AbstractAlgebra", "Nemo", "Hecke", "LoadFlint",
-  "Singular", "Polymake", "HomalgProject", "GroupAtlas", "Oscar"
-]
+include("../packages.jl")
 
 build_type = get(ENV, "BUILDTYPE", "master")
 
 Master(name) = PackageSpec(path=string(name, ".jl"))
-Stable(name) = PackageSpec(name=name)
+Stable(name) = get(locations, name, PackageSpec(name=name))
 GetPackageSpec(name) = build_type == "master" ? Master(name) : Stable(name)
 
 function toposort(graph::Dict{T, Set{T}})::Vector{T} where T

@@ -1,7 +1,4 @@
-packages = [
-  "GAP", "AbstractAlgebra", "Nemo", "Hecke", "LoadFlint",
-  "Singular", "Polymake", "HomalgProject", "GroupAtlas", "Oscar"
-]
+include("packages.jl")
 
 failed = []
 
