@@ -4,9 +4,13 @@ failed = []
 
 for package in packages
   try
-    eval(Meta.parse(string("using ", package)))
-  catch e
+    eval(Meta.parse(string("module LoadTest$(package) using $(package) end")))
+  catch
     append!(failed, [ package ])
+    for (exception, backtrace) in Base.catch_stack()
+        showerror(stdout, exception, backtrace)
+        println()
+    end
   end
 end
 
