@@ -2,7 +2,8 @@ using Pkg
 
 packages = [
   "GAP", "AbstractAlgebra", "Nemo", "Hecke", "LoadFlint",
-  "Singular", "Polymake", "HomalgProject", "GroupAtlas", "Oscar"
+  "Singular", "Polymake", "HomalgProject", "GroupAtlas",
+  "GroebnerBasis", "Oscar"
 ]
 
 locations = Dict(

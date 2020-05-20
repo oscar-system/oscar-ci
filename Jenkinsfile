@@ -88,6 +88,7 @@ node {
 		get url: "https://github.com/oscar-system/Polymake.jl"
 		get url: "https://github.com/homalg-project/HomalgProject.jl"
 		get url: "https://github.com/oscar-system/GroupAtlas.jl"
+		get url: "https://github.com/ederc/GroebnerBasis.jl"
 		get url: "https://github.com/oscar-system/Oscar.jl"
                 get url: "https://github.com/sebastianpos/NemoLinearAlgebraForCAP"
 		get url: "https://github.com/oscar-system/OSCARBinder",
@@ -98,6 +99,8 @@ node {
 		        dir: "notebooks-homalg"
 		get url: "https://github.com/oscar-system/GITFans",
 		        dir: "notebooks-gitfans"
+		get url: "https://github.com/ederc/GroebnerBasisNotebooks",
+		        dir: "notebooks-groebner"
             } else {
                 // skip preparation
 		echo "Skipping preparation stage."

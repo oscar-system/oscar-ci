@@ -28,6 +28,8 @@ tests:
   script: test-polymakejl.sh
 - name: GroupAtlas.jl
   script: test-GroupAtlas_jl.sh
+- name: GroebnerBasis.jl
+  script: test-GroebnerBasis_jl.sh
 - name: JuliaInterface
   script: test-JuliaInterface.sh
 - name: JuliaExperimental
@@ -69,4 +71,7 @@ tests:
   timeout: 300
 - name: GITFans.ipynb
   script: test-nb-gitfans.sh
+  timeout: 300
+- name: GroebnerBasis.ipynb
+  script: test-nb-groebner.sh
   timeout: 300
