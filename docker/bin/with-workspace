@@ -11,8 +11,8 @@ shift
 if [ -d "$WORKSPACE" ]; then
   export GAPROOT="$WORKSPACE/gap"
   export NEMO_SOURCE_BUILD=1
-  export JULIA_DEPOT_PATH="$WORKSPACE/jenv/pkg"
-  export JULIA_PROJECT="$WORKSPACE/jenv/proj"
+  export JULIA_DEPOT_PATH="$WORKSPACE/julia-env"
+  export JULIA_PROJECT="$WORKSPACE/julia-env"
   export PATH="$WORKSPACE/local/bin:$PATH"
   cd $WORKSPACE
   exec "$@"

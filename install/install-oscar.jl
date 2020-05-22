@@ -1,12 +1,7 @@
 using Pkg
 
 include("../packages.jl")
-
-build_type = get(ENV, "BUILDTYPE", "master")
-
-Master(name) = PackageSpec(path=string(name, ".jl"))
-Stable(name) = get(locations, name, PackageSpec(name=name))
-GetPackageSpec(name) = build_type == "master" ? Master(name) : Stable(name)
+include("../safepkg.jl")
 
 function toposort(graph::Dict{T, Set{T}})::Vector{T} where T
   graph = copy(graph)
@@ -57,7 +52,7 @@ end
 # packages in order of their dependencies to see if anything
 # breaks if we have the newest packages.
 
-if build_type != "user"
+if SafePkg.build_type != "user"
   packages = toposort(dep_graph(packages))
 end
 
@@ -69,31 +64,10 @@ catch
   # ignore IO errors
 end
 
-function Add(name)
-  try
-    Pkg.add(GetPackageSpec(name))
-  catch err
-    msg = replace(replace(replace(err.msg,
-      r"├|└" => "+"), r"─" => "-"), r"│" => "|")
-    try
-      open(pkglog, "a") do fp
-	write(fp, string("=== failed to add package ", name, "\n"))
-	write(fp, string(msg, "\n"))
-      end
-    catch
-      # ignore IO errors
-    end
-    for (exception, backtrace) in Base.catch_stack()
-      showerror(stdout, exception, backtrace)
-      println()
-    end
-  end
-end
-
-if build_type == "user"
-  Add("Oscar")
+if SafePkg.build_type == "user"
+  SafePkg.add_smart("Oscar")
 else
   for pkg in packages
-    Add(pkg)
+    SafePkg.add_smart(pkg)
   end
 end

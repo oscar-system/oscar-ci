@@ -1,21 +1,9 @@
-using Pkg
-
 include("../packages.jl")
+include("../safepkg.jl")
 
-function SafeAdd(name)
-  try
-    Pkg.add(name)
-  catch
-    for (exception, backtrace) in Base.catch_stack()
-      showerror(stdout, exception, backtrace)
-      println()
-    end
-  end
-end
-
-Pkg.add("IJulia")
-Pkg.build("IJulia")
+SafePkg.add("IJulia")
+SafePkg.build("IJulia")
 
 for pkg in notebook_packages
-  SafeAdd(pkg)
+  SafePkg.add(pkg)
 end

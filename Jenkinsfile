@@ -113,6 +113,7 @@ node {
 		sh "meta/install/install-jupyter.sh"
 		sh "meta/install/install-gap.sh"
 		sh "meta/install/install-gap-packages.sh"
+		sh "meta/install/install-finalize.sh"
             } else {
                 // skip build stage
                 echo "Skipping build stage."
@@ -123,6 +124,6 @@ node {
         }
     } finally {
         archiveArtifacts artifacts: "logs/build-${env.BUILD_NUMBER}/*"
-        archiveArtifacts artifacts: "jenv/proj/*"
+        archiveArtifacts artifacts: "julia-env/*.toml"
     }
 }

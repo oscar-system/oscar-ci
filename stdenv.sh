@@ -1,5 +1,5 @@
-export JULIA_DEPOT_PATH="${WORKSPACE}/jenv/pkg"
-export JULIA_PROJECT="${WORKSPACE}/jenv/proj"
+export JULIA_DEPOT_PATH="${WORKSPACE}/julia-env"
+export JULIA_PROJECT="${WORKSPACE}/julia-env"
 export POLYMAKE_USER_DIR="${WORKSPACE}/.polymake-default"
 export PATH="${WORKSPACE}/local/bin:${PATH}"
 export JUPYTER_BASE="${WORKSPACE}/jupyter"
