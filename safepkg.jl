@@ -1,4 +1,6 @@
 module SafePkg
+  include("packages.jl")
+
   using Pkg
 
   build_type = get(ENV, "BUILDTYPE", "master")
