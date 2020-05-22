@@ -3,5 +3,5 @@ set -e
 source meta/stdenv.sh
 set -x
 cd julia
-make -j"$JOBS"
+make -j"$BUILDJOBS"
 ln -sf "$WORKSPACE/julia/julia" "$WORKSPACE/local/bin"
