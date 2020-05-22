@@ -5,7 +5,7 @@
 #   runs the tests. File must be executable.
 # timeout: Time in seconds after which the test will be forcibly aborted.
 # after: Run this test after another test with which it may conflict.
-parallelize: false
+parallelize: 0
 tests:
 - name: CheckPackages
   script: test-packages.sh

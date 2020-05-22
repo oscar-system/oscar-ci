@@ -139,7 +139,7 @@ def make_job_url(buildnum):
     return url
 
 class TestRunner:
-    def __init__(self):
+    def __init__(self, parallelize = 0):
         # Init instance variables
         import os, threading, concurrent.futures as futures
         self.failed_tests = False
@@ -149,6 +149,8 @@ class TestRunner:
         self.job = os.environ["JOB_NAME"]
         self.build_url = os.environ["BUILD_URL"]
         self.maxjobs = int(os.environ.get("BUILDJOBS", 4))
+        if type(parallelize) is int and parallelize > 0:
+            self.maxjobs = parallelize
         if not self.build_url.endswith("/"): self.build_url += "/"
         self.log_url = self.build_url + "artifact/logs/build-" + self.buildnum
         self.logdir = "logs/build-%s" % self.buildnum
@@ -341,7 +343,7 @@ def run_tests(config):
     import sys
     tests = config["tests"]
     parallelize = config["parallelize"]
-    testrunner = TestRunner()
+    testrunner = TestRunner(parallelize)
     if parallelize:
         tasks = [ testrunner.start(test, index)
             for index, test in zip(range(len(tests)), tests) ]
