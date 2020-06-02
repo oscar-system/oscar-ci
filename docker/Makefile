@@ -1,15 +1,13 @@
-IMAGENAME=oscar-ci
-METAREPO=git@github.com:oscar-system/oscar-ci
-JENKINS_VER=latest
-JENKINS_WAR=http://mirrors.jenkins.io/war-stable/$(JENKINS_VER)/jenkins.war
+IMAGENAME="$(shell ../bin/show-image-name)"
 
-all: prepare
+all: prepare Dockerfile
 	docker build -t $(IMAGENAME) .
 
 prepare: credentials.yaml
-	test -d ci-meta || git clone $(METAREPO) ci-meta
-	unzip -tqq jenkins.war >/dev/null 2>&1 || wget $(JENKINS_WAR)
 	test -d user || mkdir -p user
+
+Dockerfile: Dockerfile.in
+	erb $< >$@
 
 credentials.yaml:
 	@echo "| Please supply a file credentials.yaml"
@@ -29,6 +27,6 @@ credentials.yaml:
 
 
 clean:
-	rm -rf ci-meta user jenkins.war credentials.yaml
+	rm -rf ci-meta user jenkins.war credentials.yaml Dockerfile
 
 .PHONY: all clean rebuild prepare

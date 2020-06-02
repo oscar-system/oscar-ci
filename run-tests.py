@@ -4,9 +4,11 @@ credentials = { }
 
 def read_credentials():
     import os, yaml
+    credentials_path = \
+      os.environ.get("CREDENTIALS", "/config/credentials.yaml")
     global credentials
     try:
-        path = os.path.expanduser("~/credentials.yaml")
+        path = os.path.expanduser(credentials_path)
         with open(path) as credsfile:
             creds = yaml.safe_load(credsfile.read())
             if creds:
@@ -144,7 +146,7 @@ class TestRunner:
         import os, threading, concurrent.futures as futures
         self.failed_tests = False
         self.buildnum = os.environ.get("BUILD_NUMBER", "0")
-        self.jenkins_home = os.environ["JENKINS_HOME"]
+        self.jenkins_home = "/var/jenkins_home"
         self.workspace = os.environ["WORKSPACE"]
         self.job = os.environ["JOB_NAME"]
         self.build_url = os.environ["BUILD_URL"]

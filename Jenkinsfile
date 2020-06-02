@@ -52,10 +52,17 @@ def updateTimestamp() {
 
 node {
     def workspace = pwd()
+    def jenkins_home = env.JENKINS_HOME
+    // Docker image to use as build/test environment
+    def buildenv = env.OSCAR_CI_IMAGE ?: env.OSCAR_CI_NAME ?: "oscar-ci"
+    def run_in_docker = { block ->
+      docker.image(buildenv).inside("-v ${jenkins_home}:/var/jenkins_home") {
+	block()
+      }
+    }
     // URLs
-    def metarepo = env.OSCAR_CI_REPO ?
-      "${env.OSCAR_CI_REPO}" :
-      "https://github.com/oscar-system/oscar-ci"
+    def metarepo =
+      env.OSCAR_CI_REPO ?: "https://github.com/oscar-system/oscar-ci"
 
     // parameters
     def julia_version = "${params.JULIA_VERSION}"
@@ -108,19 +115,23 @@ node {
         }
         stage('Build') {
             if (rebuild != "none") {
-	        sh "meta/install/install-julia.sh"
-		sh "meta/install/install-oscar.sh"
-		sh "meta/install/install-jupyter.sh"
-		sh "meta/install/install-gap.sh"
-		sh "meta/install/install-gap-packages.sh"
-		sh "meta/install/install-finalize.sh"
+	        run_in_docker {
+		    sh "meta/install/install-julia.sh"
+		    sh "meta/install/install-oscar.sh"
+		    sh "meta/install/install-jupyter.sh"
+		    sh "meta/install/install-gap.sh"
+		    sh "meta/install/install-gap-packages.sh"
+		    sh "meta/install/install-finalize.sh"
+		}
             } else {
                 // skip build stage
                 echo "Skipping build stage."
             }
         }
         stage('Test') {
-	    sh "meta/run-tests.sh"
+	    run_in_docker {
+		sh "meta/run-tests.sh"
+	    }
         }
     } finally {
         archiveArtifacts artifacts: "logs/build-${env.BUILD_NUMBER}/*"
