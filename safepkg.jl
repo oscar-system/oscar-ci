@@ -3,11 +3,18 @@ module SafePkg
 
   using Pkg
 
-  build_type = get(ENV, "BUILDTYPE", "master")
+  @enum Mode stable master
+
+  global mode = stable
+
+  function set_mode(m)
+    global mode
+    mode = m
+  end
 
   Master(name) = PackageSpec(path=string(name, ".jl"))
   Stable(name) = get(locations, name, PackageSpec(name=name))
-  GetPackageSpec(name) = build_type == "master" ? Master(name) : Stable(name)
+  GetPackageSpec(name) = mode == stable ? Stable(name) : Master(name)
 
   function LogPkgErr(err)
     msg = replace(replace(replace(err.msg,
