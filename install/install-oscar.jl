@@ -24,7 +24,7 @@ include("../safepkg.jl")
 
 build_type = get(ENV, "BUILDTYPE", "master")
 
-SafePkg.set_mode(build_type == "master" ? SafePkg.stable : SafePkg.master)
+SafePkg.set_mode(build_type == "master" ? SafePkg.master : SafePkg.stable)
 
 # Topological sort of dependencies.
 # Any cycles are appended to the graph "as is".
