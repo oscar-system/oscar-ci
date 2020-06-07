@@ -45,6 +45,10 @@ tests:
   script: test-nb-CohP1.sh
   timeout: 300
   after: HomalgProject.jl
+- name: TiltingEquivalence.ipynb
+  script: test-nb-tilteq.sh
+  timeout: 300
+  after: HomalgProject.jl
 - name: Hecke.ipynb
   script: test-nb-Hecke.sh
   timeout: 300
