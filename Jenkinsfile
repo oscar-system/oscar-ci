@@ -56,7 +56,7 @@ node {
     // Docker image to use as build/test environment
     def buildenv = env.OSCAR_CI_IMAGE ?: env.OSCAR_CI_NAME ?: "oscar-ci"
     def run_in_docker = { block ->
-      docker.image(buildenv).inside("-v ${jenkins_home}:/var/jenkins_home") {
+      docker.image(buildenv).inside("--init -v ${jenkins_home}:/var/jenkins_home") {
 	block()
       }
     }
