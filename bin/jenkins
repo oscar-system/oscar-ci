@@ -1,10 +1,9 @@
-#!/bin/bash
-set -e
-BASEDIR="$(realpath "$(dirname "$0")/..")"
-source "$BASEDIR/jenkins-env.sh"
-test -f "$JENKINS_WAR" || {
-  echo "Please install $JENKINS_WAR first."
-  echo "You can use $BASEDIR/bin/get-jenkins for that."
+#!/usr/bin/env ruby
+require_relative "../jenkins-env.rb"
+require "shellwords"
+if not File.exist?($JENKINS_WAR) then
+  puts "Please install $JENKINS_WAR first."
+  puts "You can use bin/get-jenkins for that."
   exit 1
-}
-java -Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=600 -jar "$JENKINS_WAR" "$@"
+end
+exec "java -Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=600 -jar #{$JENKINS_WAR} #{Shellwords.shelljoin(ARGV)}"

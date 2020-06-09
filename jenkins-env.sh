@@ -1,4 +1,0 @@
-export OSCAR_CI_NAME="${OSCAR_CI_NAME:-oscar-ci}"
-export OSCAR_CI_IMAGE="${OSCAR_CI_IMAGE:-$OSCAR_CI_NAME}"
-export JENKINS_HOME="$HOME/jenkins/$OSCAR_CI_NAME"
-JENKINS_WAR="$BASEDIR/jenkins.war"

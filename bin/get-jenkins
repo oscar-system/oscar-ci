@@ -1,7 +1,5 @@
-#!/bin/bash
-set -e
-BASEDIR="$(realpath "$(dirname "$0")/..")"
-source "$BASEDIR/jenkins-env.sh"
-JENKINS_VER="${JENKINS_VER:-latest}"
-JENKINS_URL="http://mirrors.jenkins.io/war-stable/${JENKINS_VER}/jenkins.war"
-wget -O "$JENKINS_WAR" "$JENKINS_URL"
+#!/usr/bin/env ruby
+require_relative "../jenkins-env.rb"
+$JENKINS_VER = ENV["JENKINS_VER"] || "latest"
+$JENKINS_URL="http://mirrors.jenkins.io/war-stable/#{$JENKINS_VER}/jenkins.war"
+system "wget", "-O", $JENKINS_WAR, $JENKINS_URL

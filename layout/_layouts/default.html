@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="30" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Build {{site.data.ci.build}} | {{page.title}}</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Build {{site.data.ci.build}}" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="OSCAR continuous integration status" />
+<meta property="og:description" content="OSCAR continuous integration status" />
+<link rel="canonical" href="https://{{site.data.ci.organization}}.github.io/{{site.data.ci.repo}}/" />
+<meta property="og:url" content="https://{{site.data.ci.organization}}.github.io/{{site.data.ci.repo}}/" />
+<meta property="og:site_name" content="{{site.data.ci.repo}}" />
+<script type="application/ld+json">
+{"headline":"Build {{site.data.ci.build}}","@type":"WebSite","url":"{{site.data.ci.repourl}}","name":"{{site.data.ci.repo}}","description":"OSCAR continuous integration status","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/{{site.data.ci.repo}}/assets/css/style.css">
+    <link rel="stylesheet" href="/{{site.data.ci.repo}}/assets/css/cards.css">
+  </head>
+  <body>
+
+    <div style=" vertical-align: middle; margin: 0.5rem">
+      <div style="float: left; font-size:2em; font-weight:600; display:inline-block; height: 3rem; vertical-align: middle">
+        <a href="{{site.data.ci.build_url}}">Build {{site.data.ci.build}}</a>
+      </div>
+      <div style="float: right; text-align: right; display:inline-block; height: 3rem; line-height: 48px; vertical-align: middle;">
+        <a href="index.html">Card view</a> - <a href="table.html">Table view</a>
+       - <a href="{{site.data.ci.repourl}}">GitHub</a>
+      </div>
+      <div style="clear: both">
+        {% assign tests = site.data.ci.tests | sort: "start" %}
+        run from {{ tests[0].start }} until {{ tests[-1].start }}
+      </div>
+    </div>
+
+    {{content}}
+  </body>
+</html>

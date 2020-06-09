@@ -3,4 +3,4 @@ set -e
 PKGLOG="$WORKSPACE/.pkgerrors"
 test -r "$PKGLOG" && cat "$PKGLOG"
 # make test
-julia/julia meta/packages-test.jl
+julia meta/packages-test.jl

@@ -1,20 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env ruby
+require_relative "../jenkins-env.rb"
+require "fileutils"
 
-if [ ! -d "$JENKINS_HOME/jobs" ]; then
-  echo "Jenkins has not been setup yet."
+def fatal(msg)
+  puts msg
   exit 1
-fi
+end
 
-if [ -z "$1" ]; then
-  echo "usage: create-stdjob <jobname>"
-  exit 1
-fi
+if not Dir.exist?("#{$JENKINS_HOME}/jobs") then
+  fatal "Jenkins has not been setup yet."
+end
 
-if [ -d "$JENKINS_HOME/jobs/$1" ]; then
-  echo "Job '$1' already exists."
-  exit 1
-fi
+if ARGV.size != 1 or ARGV.first == "" then
+  fatal "usage: create-stdjob <jobname>"
+end
 
-JOBDIR="$JENKINS_HOME/jobs/$1"
-mkdir -p $JOBDIR
-cp -f $HOME/develop/ci-meta/config.xml $JOBDIR
+job = ARGV.first
+jobdir = "#{$JENKINS_HOME}/jobs/#{job}"
+
+if Dir.exist?(jobdir) then
+  fatal "Job #{job} already exists."
+end
+
+FileUtils.mkdir_p jobdir
+FileUtils.cp_f File.expand_path("#{__dir__}/../config.xml"), jobdir

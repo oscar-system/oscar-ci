@@ -1,0 +1,422 @@
+#!/usr/bin/env ruby
+
+require "fileutils"
+require "timeout"
+require "yaml"
+require "yaml/store"
+require "open3"
+
+require_relative "settings.rb"
+require_relative "settings.rb"
+
+class GitServer
+  def initialize(sshbase, httpsbase, credfile)
+    @sshbase = sshbase
+    @httpsbase = httpsbase
+    @credentials = File.open(credfile) do | fp |
+      YAML.safe_load(fp.read)
+    end
+  end
+
+  def [](job)
+    @credentials[job]
+  end
+
+  def repo_info(job)
+    info = @credentials[job]
+    if not info then
+      return nil
+    end
+    repo = info["repo"]
+    key = info["key"]
+    sshurl = "#{@sshbase}/#{repo}"
+    httpsurl = "#{@httpsbase}/#{repo}"
+    return repo, key, sshurl, httpsurl
+  end
+end
+
+class GitRepo
+
+  attr_reader :job, :path, :sshurl, :httpsurl, :key
+
+  def initialize(server, job)
+    @server = server
+    @env = { }
+    @job = job
+    @path, @key, @sshurl, @httpsurl = server.repo_info(job)
+  end
+
+  def git(*subcmd, autocd: true)
+    cmd = [ "git" ]
+    if autocd then
+      cmd += [ "-C", "report" ]
+    end
+    cmd += subcmd
+    stdout, stderr, status = Open3.capture3(@env, *cmd, stdin_data: "")
+    File.open(".gitlog", "a") do | fp |
+      fp.puts(YAML.dump({
+        "time" => Time.now.to_s,
+        "cmd" => cmd.join(" "),
+        "stdout" => stdout,
+        "stderr" => stderr,
+      }))
+    end
+    return stdout, stderr, status
+  end
+
+  def fetch
+    if Dir.exist?("report") then
+      git("remote", "set-url", "origin", "--", @sshurl)
+      git("pull", "--ff-only", "origin", "master")
+    else
+      FileUtils.rm_rf("report.tmp")
+      git("clone", @sshurl, "report.tmp", autocd: false)
+      git("-C", "report.tmp", "config",
+        "--local", "user.email", "oscar@computeralgebra.de", autocd: false)
+      git("-C", "report.tmp", "config",
+        "--local", "user.name", "OSCAR Automation", autocd: false)
+      git("-C", "report.tmp", "reset", "--hard", "master")
+      FileUtils.mv("report.tmp", "report")
+    end
+  end
+
+  def push
+    git("remote", "set-url", "origin", "--", @sshurl)
+    git("push", "-f", "origin", "master")
+  end
+
+  def add_file(path, contents)
+    dir = File.dirname(path)
+    if dir != "" then
+      dir = "report/#{dir}"
+      FileUtils.mkdir_p(dir)
+      File.open("report/#{path}", "wb") do | fp |
+        fp.write(contents)
+      end
+    end
+    git("add", "--", path)
+  end
+
+  def add_tree(path)
+    Dir.glob("**/{*,.*}", base: path) do | relpath |
+      loc = File.join(path, relpath)
+      add_file relpath, File.read(loc) if File.file?(loc)
+    end
+  end
+
+  def commit(msg)
+    git("commit", "-m", msg)
+  end
+
+  def upload(job, msg, files: {}, dirs: [])
+    return if not @server[job]
+    keyfile = File.expand_path("~/.ssh_git_key.#{job}")
+    File.write(keyfile, @key)
+    FileUtils.chmod(0o600, keyfile)
+    @env = {
+      "GIT_SSH_COMMAND" => "ssh -o 'StrictHostKeyChecking no' -i #{keyfile}"
+    }
+    fetch
+    dirs.each do | path |
+      add_tree(path)
+    end
+    files.each do | path, contents |
+      add_file(path, contents)
+    end
+    commit(msg)
+    push
+    FileUtils.rm_f(keyfile)
+  end
+end
+
+class Logger
+  def initialize(path)
+    @path = path
+    FileUtils.mkdir_p(File.dirname(@path))
+  end
+
+  def <<(msg)
+    File.open(@path, "a") do | fp |
+      fp.write msg
+    end
+  end
+end
+
+class TestRunner
+
+  attr_reader :failed_tests
+
+  DEFAULT_TIMEOUT = 1800
+
+  def initialize(repo, tests)
+    @repo = repo
+    @tests = tests
+    @failed_tests = false
+    @buildnum = ENV["BUILD_NUMBER"] || "0"
+    @workspace = $WORKSPACE
+    @job = repo.job
+    @buildurl = strip_trailing_slashes(ENV["BUILD_URL"])
+    @artifacturl = "#{@buildurl}/artifact"
+    @jenkinsurl = strip_trailing_slashes(ENV["JENKINS_URL"])
+    @maxjobs = (ENV["BUILDJOBS"] || 4).to_i
+    @logdir = "logs/build-#{@buildnum}"
+    @logurlbase = "#{@artifacturl}/#{@logdir}"
+    @startdate = nil
+    @enddate = nil
+    @successes = []
+    @failures = []
+    @testresults = {}
+    @jenkinshome = ENV["JENKINS_HOME"] || "/var/jenkins_home"
+    @jobstatepath = "#{@jenkinshome}/jobstate/#{@job}.yaml"
+    FileUtils.mkdir_p(File.dirname(@jobstatepath))
+    @jobstate = YAML::Store.new(@jobstatepath)
+    @lock = Thread::Mutex.new
+  end
+
+  private def strip_trailing_slashes(url)
+    url = url.dup
+    while url.end_with?("/") do url.chop! end
+    url
+  end
+
+  private def report(msg, success:)
+    if success then
+      @successes.append(msg)
+    else
+      @failures.append(msg)
+    end
+  end
+
+  private def buildurl
+    "#{@buildurl}/"
+  end
+
+  private def make_build_url(buildnum)
+    "#{@jenkinsurl}job/#{@job}/#{buildnum}/"
+  end
+
+  private def update_jobstate(info, testname, exitcode)
+    last_success = first_failure = nil
+    @lock.synchronize do
+      @jobstate.transaction do
+        info["last_success"] = false
+        info["last_success_url"] = nil
+        info["first_failure"] = false
+        info["first_failure_url"] = nil
+        if exitcode.zero? then
+          last_success = ""
+          first_failure = ""
+          @jobstate[testname] = [ @buildnum, "" ]
+        else
+          if @jobstate[testname] then
+            if @jobstate[testname][1] == ""
+              @jobstate[testname][1] = @buildnum
+            end
+          else
+            @jobstate[testname] = [ "", @buildnum ]
+          end
+          if @jobstate[testname][0] == "" then
+            last_success = "unknown"
+            first_failure = "unknown"
+          else
+            err = @jobstate[testname]
+            url = err.map { | n | make_build_url(n.to_s) }
+            last_success = "[#{err[0]}](#{url[0]})"
+            first_failure = "[#{err[1]}](#{url[1]})"
+            info["last_success"] = err[0].to_i
+            info["last_success_url"] = url[0]
+            info["first_failure"] = err[1].to_i
+            info["first_failure_url"] = url[1]
+          end
+        end
+      end
+    end
+    return last_success, first_failure
+  end
+
+  private def test_command(test)
+    if test["script"] then
+      %Q{meta/tests/#{test["script"]}}
+    elsif test["sh"] then
+      test["sh"]
+    elsif test["julia"] then
+      %w{julia -e} + [ test["julia"] ]
+    elsif test["package"] then
+      %w{julia -e} + [ %Q{import Pkg; Pkg.test("#{test["package"]}")} ]
+    elsif test["gap"] then
+      %w{gap --quitonbreak -c} + [ test["gap"] ]
+    elsif test["gappkg"] then
+      gapcode = %Q{Read(Filename(DirectoriesPackageLibrary("#{test["gappkg"]}", "tst"), "testall.g"));}
+      %w{gap --quitonbreak -c} + [ gapcode ]
+    elsif test["notebook"] then
+      [ "ruby", "meta/check-julia-notebook.rb", test["notebook"] ]
+    else
+      fail "invalid test type" # TODO
+    end
+  end
+
+  private def run_test(test)
+    testname = test["name"]
+    testfilename = testname.gsub(/[^-._a-zA-Z0-9]+/, "-")
+    testid = testname.gsub(/[^a-zA-Z0-9]+/, "-").downcase
+    info = { "name" => testname, "id" => testid }
+    timeout = test["timeout"] || DEFAULT_TIMEOUT
+    logfile = "#{@logdir}/#{testfilename}.log"
+    logurl = info["log"] = "#{@logurlbase}/#{testfilename}.log"
+    log = Logger.new(logfile)
+    begin
+      start_time = Time.now
+      @lock.synchronize do
+        @start_date ||= start_time.strftime("%Y-%m-%d")
+      end
+      start = start_time.strftime("%Y-%m-%d %H:%M")
+      info["start"] = start
+      start_short = start_time.strftime("%H:%M")
+      log << "=== #{testname} at #{start_short}\n"
+      testcmd = test_command(test)
+      polymake_user_dir = "#{$WORKSPACE}/.polymake/#{testfilename}"
+      FileUtils.rm_rf(polymake_user_dir)
+      FileUtils.mkdir_p(polymake_user_dir)
+      testenv = {
+        "POLYMAKE_USER_DIR" => polymake_user_dir
+      }
+      pid = -1
+      status = nil
+      Timeout.timeout(timeout) do
+        if testcmd.is_a?(String) then
+          pid = spawn(testenv, testcmd,
+            err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true)
+        else
+          pid = spawn(testenv, [testcmd.first, testcmd.first], *testcmd[1..-1],
+            err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true)
+        end
+        _, status = Process.waitpid2(pid)
+      end
+      exitcode = status.exitstatus
+      if exitcode.zero? then
+        verbose_status = "SUCCESS"
+        statuscode = "\u2705"
+      else
+        verbose_status = "FAILURE"
+        statuscode = "\u274C"
+      end
+    rescue Timeout::Error
+      if pid >= 0 then
+        pgid = Process.getpgid(pid)
+        Process.kill("TERM", pgid)
+        sleep 5
+        Process.kill("KILL", pgid)
+      end
+      exitcode = -1
+      verbose_status = "TIMEOUT"
+      statuscode = "\u26A0"
+    rescue StandardError => ex
+      log << "#{ex.backtrace.join("\n")}\n"
+      log << "#{ex.inspect}\n"
+      exitcode = -1
+      verbose_status = "INTERNAL ERROR"
+      statuscode = "\u2049"
+    end
+    @lock.synchronize do
+      @failed_tests ||= exitcode != 0
+    end
+    info["success"] = exitcode.zero?
+    info["exitcode"] = exitcode
+    info["status"] = verbose_status.downcase
+    if verbose_status == "FAILURE" then
+      verbose_status += " (status = #{exitcode})"
+    end
+    stop_time = Time.now
+    stop = stop_time.strftime("%Y-%m-%d %H:%M")
+    @lock.synchronize do
+      new_end_date = stop_time.strftime("%Y-%m-%d")
+      @end_date ||= new_end_date
+      @end_date = new_end_date if new_end_date > @end_date
+    end
+    duration = (stop_time - start_time).round
+    info["duration"] = duration
+    last_success, first_failure = update_jobstate(info, testname, exitcode)
+    @testresults[testname] = info
+    testsummary =  "| #{testname} "
+    testsummary << "| #{statuscode} [#{verbose_status}](#{logurl}) "
+    testsummary << "| #{start_short} | #{duration} seconds "
+    testsummary << "| #{last_success} | #{first_failure} "
+    testsummary << "|"
+    @lock.synchronize do
+      report(testsummary, success: exitcode.zero?)
+    end
+    log << "=== #{verbose_status} at #{stop}\n"
+    return format("Testing: %-19<name>s at %<time>s => %<status>s",
+      name: testname, time: start, status: verbose_status)
+  end
+
+  def finish_report
+    report = []
+    report << "## [Build #{@buildnum}](#{buildurl})\n\n"
+    report << "* Started on: #{@start_date}\n"
+    report << "* Ended on: #{@end_date}\n\n"
+    report << "| Test Name    | Result | Start | Duration | Last Success | First Failure |\n"
+    report << "|:-------------|:-------|:------|:---------|:-------------|:--------------|\n"
+    report << "#{@failures.join("\n")}\n" unless @failures.empty?
+    report << "#{@successes.join("\n")}\n" unless @successes.empty?
+    @report = report.join
+    puts "Logs: #{@logurlbase}"
+  end
+
+  def testresults_ordered
+    result = []
+    for test in @tests do
+      result << @testresults[test["name"]]
+    end
+    return result
+  end
+
+  def run_all
+    for test in @tests do
+      puts run_test(test)
+    end
+    finish_report
+    if @repo.path then
+      @repo.upload(@job, "Build ##{@buildnum}",
+        dirs: [
+          "meta/layout",
+        ],
+        files: {
+          "README.md" => @report,
+          "_data/ci.yml" => YAML.dump({
+            "build" => @buildnum.to_i,
+            "build_url" => buildurl,
+            "job" => @job,
+            "organization" => File.dirname(@repo.path),
+            "repo" => File.basename(@repo.path),
+            "repourl" => @repo.httpsurl,
+            "tests" => testresults_ordered,
+          })
+        })
+    end
+  end
+
+end
+
+def main
+  FileUtils.mkdir_p "logs"
+  config = YAML.safe_load(File.read("meta/tests/config.yaml"))
+  github = GitServer.new("ssh://git@github.com", "https://github.com",
+    ENV["CREDENTIALS"] || "/config/credentials.yaml")
+  repo = GitRepo.new(github, ENV["JOB_NAME"])
+  tests = config["tests"]
+  parallelize = config["parallelize"]
+  case parallelize
+  when false, true then
+    parallelize = parallelize.to_i
+  when Integer then
+    # do nothing
+  else
+    puts "WARNING: invalid parallelization option"
+  end
+  testrunner = TestRunner.new(repo, tests)
+  testrunner.run_all
+  exit 1 if testrunner.failed_tests
+end
+
+main if caller.empty?

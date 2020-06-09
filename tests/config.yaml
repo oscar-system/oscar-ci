@@ -12,70 +12,68 @@ tests:
 - name: GAP
   script: test-gap.sh
 - name: GAP.jl
-  script: test-gapjl.sh
+  package: GAP
 - name: Nemo.jl
-  script: test-nemo.sh
+  package: Nemo
 - name: Hecke.jl
-  script: test-hecke.sh
+  package: Hecke
   timeout: 3600
 - name: AbstractAlgebra.jl
-  script: test-absalg.sh
+  package: AbstractAlgebra
 - name: Singular.jl
-  script: test-singularjl.sh
+  package: Singular
 - name: HomalgProject.jl
-  script: test-HomalgProject_jl.sh
+  package: HomalgProject
 - name: Polymake.jl
-  script: test-polymakejl.sh
+  package: Polymake
 - name: GroupAtlas.jl
-  script: test-GroupAtlas_jl.sh
+  package: GroupAtlas
 - name: GroebnerBasis.jl
-  script: test-GroebnerBasis_jl.sh
+  package: GroebnerBasis
 - name: JuliaInterface
-  script: test-JuliaInterface.sh
+  gappkg: JuliaInterface
 - name: JuliaExperimental
-  script: test-JuliaExperimental.sh
+  gappkg: JuliaExperimental
 - name: Oscar.jl
-  script: test-oscar.sh
+  package: Oscar
 - name: NemoLinearAlgebraForCAP
-  script: test-NemoLinearAlgebraForCAP.sh
+  sh: 'make -C "$(julia meta/gappkgpath.jl)"/NemoLinearAlgebraForCAP test'
 - name: AbstractAlgebra.ipynb
-  script: test-nb-AbsAlg.sh
+  notebook: notebooks/AbstractAlgebra.ipynb
   timeout: 300
 - name: CohP1.ipynb
-  script: test-nb-CohP1.sh
+  notebook: notebooks-homalg/CohP1.ipynb
   timeout: 300
-  after: HomalgProject.jl
 - name: TiltingEquivalence.ipynb
-  script: test-nb-tilteq.sh
+  notebook: notebooks-homalg/TiltingEquivalence.ipynb
   timeout: 300
-  after: HomalgProject.jl
 - name: Hecke.ipynb
-  script: test-nb-Hecke.sh
+  notebook: notebooks/Hecke.ipynb
   timeout: 300
 - name: Singular.ipynb
-  script: test-nb-Singular.sh
+  notebook: notebooks/Singular.ipynb
   timeout: 300
 - name: g-vectors.ipynb
-  script: test-nb-g-vectors.sh
+  notebook: notebooks-polymake/polymake/g-vectors_of_random_simplicial_6-polytopes.ipynb
   timeout: 900
 - name: K3-16.ipynb
-  script: test-nb-K3-16.sh
+  notebook: notebooks-polymake/polymake/K3-16.ipynb
   timeout: 900
 - name: c-automorphisms.ipynb
-  script: test-nb-comb-auto.sh
+  notebook: notebooks-polymake/MPI-demo-200124/combinatorial-automorphisms.ipynb
   timeout: 900
 - name: wronski-poly.ipynb
-  script: test-nb-wronski-poly.sh
+  notebook: notebooks-polymake/MPI-demo-200124/wronski-polynomials.ipynb
   timeout: 900
 - name: Tropicalization.ipynb
-  script: test-nb-Tropicalization.sh
+  notebook: notebooks-polymake/patchworking/Tropicalization.ipynb
   timeout: 900
 - name: "uMPS(2,2,4)_0dim.ipynb"
-  script: test-nb-umps.sh
+  notebook: "notebooks-homalg/uMPS(2,2,4)_0dim.ipynb"
   timeout: 300
 - name: GITFans.ipynb
-  script: test-nb-gitfans.sh
+  notebook: notebooks-gitfans/ipynb/GITFans.ipynb
   timeout: 300
 - name: GroebnerBasis.ipynb
-  script: test-nb-groebner.sh
+  notebook: notebooks-groebner/GroebnerBasis.ipynb
   timeout: 300

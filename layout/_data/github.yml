@@ -1,0 +1,29 @@
+#CheckPackages: 
+OscarForHomalg: https://github.com/homalg-project/OscarForHomalg
+#GAP: 
+GAP.jl: https://github.com/oscar-system/GAP.jl
+Nemo.jl: https://github.com/Nemocas/Nemo.jl
+Hecke.jl: https://github.com/thofma/Hecke.jl
+AbstractAlgebra.jl: https://github.com/Nemocas/AbstractAlgebra.jl
+Singular.jl: https://github.com/oscar-system/Singular.jl
+HomalgProject.jl: https://github.com/homalg-project/HomalgProject.jl
+Polymake.jl: https://github.com/oscar-system/Polymake.jl
+GroupAtlas.jl: https://github.com/oscar-system/GroupAtlas.jl
+JuliaInterface: https://github.com/oscar-system/GAP.jl
+JuliaExperimental: https://github.com/oscar-system/GAP.jl
+Oscar.jl: https://github.com/oscar-system/Oscar.jl
+NemoLinearAlgebraForCAP: https://github.com/sebastianpos/NemoLinearAlgebraForCAP
+AbstractAlgebra.ipynb: https://github.com/oscar-system/OSCARBinder
+CohP1.ipynb: https://github.com/homalg-project/CapHomalgNotebooks
+Hecke.ipynb: https://github.com/oscar-system/OSCARBinder
+Polymake.ipynb: https://github.com/oscar-system/OSCARBinder
+Singular.ipynb: https://github.com/oscar-system/OSCARBinder
+g-vectors.ipynb: https://github.com/micjoswig/oscar-notebooks
+K3-16.ipynb: https://github.com/micjoswig/oscar-notebooks
+c-automorphisms.ipynb: https://github.com/micjoswig/oscar-notebooks
+wronski-poly.ipynb: https://github.com/micjoswig/oscar-notebooks
+Tropicalization.ipynb: https://github.com/micjoswig/oscar-notebooks
+"uMPS(2,2,4)_0dim.ipynb": https://github.com/homalg-project/CapHomalgNotebooks
+GITFans.ipynb: https://github.com/oscar-system/GITFans
+GroebnerBasis.ipynb: https://github.com/ederc/GroebnerBasisNotebooks
+TiltingEquivalence.ipynb: https://github.com/homalg-project/CapHomalgNotebooks

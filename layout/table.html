@@ -1,0 +1,38 @@
+---
+title: Table view
+layout: default
+---
+<div class="container-lg px-3 my-5 markdown-body">
+<table>
+  <thead>
+    <tr>
+      <th align="left">Test Name</th>
+      <th align="left">Result</th>
+      <th align="left">Start</th>
+      <th align="left">Duration</th>
+      <th align="left">Last Success</th>
+      <th align="left">First Failure</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in site.data.ci.tests %}
+      <tr>
+        <td align="left">{{t.name}}</td>
+        <td align="left">
+          {% if t.success %}
+            <g-emoji class="g-emoji" alias="white_check_mark" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2705.png">✅</g-emoji>
+            <a href="{{t.log}}" rel="nofollow">{{t.status}}</a>
+          {% else %}
+            <g-emoji class="g-emoji" alias="x" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/274c.png">❌</g-emoji>
+            <a href="{{t.log}}" rel="nofollow">{{t.status}} (status = {{t.exitcode}})</a>
+          {% endif %}
+        </td>
+        <td align="left">{{t.start | date: "%H:%M"}}</td>
+        <td align="left">{{t.duration}} seconds</td>
+        <td align="left">{% if t.last_success %}<a href="{{t.last_success_url}}">{{t.last_success}}</a>{% endif %}</td>
+        <td align="left">{% if t.first_failure %}<a href="{{t.first_failure_url}}">{{t.first_failure}}</a>{% endif %}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+<table>
+</div>

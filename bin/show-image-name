@@ -1,5 +1,3 @@
-#!/bin/bash
-set -e
-BASEDIR="$(realpath "$(dirname "$0")/..")"
-source "$BASEDIR/jenkins-env.sh"
-echo "$OSCAR_CI_IMAGE"
+#!/usr/bin/env ruby
+require_relative "../jenkins-env"
+puts $OSCAR_CI_IMAGE

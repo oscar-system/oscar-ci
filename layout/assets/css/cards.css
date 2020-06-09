@@ -1,0 +1,98 @@
+/* 
+Based on https://travishorn.com/responsive-grid-in-2-minutes-with-css-grid-layout-4842a41420fe
+ */
+
+.card {
+  color: black;
+  padding-left: 0.7rem;
+  padding-right: 0.7rem;
+  height: 6rem;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.cards {
+/*   max-width: 1500px; */
+  margin: 0 auto;
+  display: grid;
+  padding: 0.5rem;
+  grid-gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+/* 
+
+@media (min-width: 600px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .cards { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1200px) {
+  .cards { grid-template-columns: repeat(4, 1fr); }
+}
+ */
+
+.success { background-color: #A4E945; }
+
+.failure { background-color: #FF4E4E; }
+
+/* unvisited link */
+.card a:link {
+  color: black;
+  text-decoration:underline;
+}
+
+/* visited link */
+.card a:visited {
+  color: black;
+}
+
+/* mouse over link */
+.card a:hover {
+  color: #444;
+}
+
+/* selected link */
+.card a:active {
+  color: blue;
+}
+
+.card h3 {
+  color: black;
+  font-size:2em
+}
+
+.nemolinearalgebraforcap h3 {
+  font-size:1.3em !important
+}
+
+.abstractalgebra-ipynb h3 {
+  font-size:1.6em !important
+}
+
+.c-automorphisms-ipynb h3 {
+  font-size:1.3em !important
+}
+
+.wronski-poly-ipynb h3 {
+  font-size:1.6em !important
+}
+
+.tropicalization-ipynb h3 {
+  font-size:1.6em !important
+}
+
+.umps-2-2-4-0dim-ipynb h3 {
+  font-size:1.3em !important
+}
+
+.groebnerbasis-ipynb h3 {
+  font-size:1.6em !important
+}
+
+.tiltingequivalence-ipynb h3 {
+  font-size:1.3em !important
+}
+

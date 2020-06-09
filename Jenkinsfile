@@ -77,7 +77,7 @@ node {
             }
 	    updateTimestamp()
 	    get url: metarepo, dir: "meta"
-	    sh "meta/prepare.sh"
+	    sh "meta/prepare.rb"
             // Update repositories
             if (rebuild != "none") {
 		get url: "https://github.com/julialang/julia",
@@ -116,12 +116,12 @@ node {
         stage('Build') {
             if (rebuild != "none") {
 	        run_in_docker {
-		    sh "meta/install/install-julia.sh"
-		    sh "meta/install/install-oscar.sh"
-		    sh "meta/install/install-jupyter.sh"
-		    sh "meta/install/install-gap.sh"
-		    sh "meta/install/install-gap-packages.sh"
-		    sh "meta/install/install-finalize.sh"
+		    sh "meta/install/install-julia.rb"
+		    sh "meta/install/install-oscar.rb"
+		    sh "meta/install/install-jupyter.rb"
+		    sh "meta/install/install-gap.rb"
+		    sh "meta/install/install-gap-packages.rb"
+		    sh "meta/install/install-finalize.rb"
 		}
             } else {
                 // skip build stage
@@ -130,7 +130,7 @@ node {
         }
         stage('Test') {
 	    run_in_docker {
-		sh "meta/run-tests.sh"
+		sh "meta/run-tests.rb"
 	    }
         }
     } finally {
