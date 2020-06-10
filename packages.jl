@@ -11,6 +11,6 @@ locations = Dict(
 )
 
 notebook_packages = [
-  "Cxx", "ImplicitPlots", "Plots", "HomotopyContinuation",
+  "ImplicitPlots", "Plots", "HomotopyContinuation",
   PackageSpec(path="notebooks-gitfans")
 ]
