@@ -192,7 +192,7 @@ class TestRunner
   end
 
   private def make_build_url(buildnum)
-    "#{@jenkinsurl}job/#{@job}/#{buildnum}/"
+    "#{@jenkinsurl}/job/#{@job}/#{buildnum}/"
   end
 
   private def update_jobstate(info, testname, exitcode)
