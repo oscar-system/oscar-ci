@@ -163,8 +163,8 @@ class TestRunner
     @logurlbase = "#{@artifacturl}/#{@logdir}"
     @startdate = nil
     @enddate = nil
-    @successes = []
-    @failures = []
+    @successes = {}
+    @failures = {}
     @testresults = {}
     @jenkinshome = ENV["JENKINS_HOME"] || "/var/jenkins_home"
     @jobstatepath = "#{@jenkinshome}/jobstate/#{@job}.yaml"
@@ -173,17 +173,90 @@ class TestRunner
     @lock = Thread::Mutex.new
   end
 
+  class Constraints
+    def initialize(tests)
+      @constraints = {}
+      @all = []
+      @blocked = false
+      for test in tests do
+        @all |= test["uses"].to_s.split if test["uses"] != "*"
+        @all |= [ test["name"] ]
+      end
+    end
+
+    private def get_uses(test)
+      result = test["uses"].to_s.split + [ test["name"] ]
+      result = @all if result.include?("*")
+      return result
+    end
+
+    def add?(test)
+      uses = get_uses(test)
+      result = uses.all? { | use | not @constraints[use] }
+      if result then
+        uses.each { | use | @constraints[use] = true }
+      end
+      return result
+    end
+
+    def remove(test)
+      uses = get_uses(test)
+      uses.each { | use | @constraints[use] = false }
+    end
+  end
+
+  private def run_tests_in_parallel
+    todo = Thread::Queue.new
+    done = Thread::Queue.new
+    threads = []
+    @maxjobs.times do
+      threads << Thread.new(todo, done) do | todo, done |
+        loop do
+          test = todo.pop
+          run_test(test)
+          done.push test
+        end
+      end
+    end
+    constraints = Constraints.new(@tests)
+    complete = 0
+    remaining = @tests.dup
+    while not remaining.empty? do
+      scheduled = false
+      for test in remaining do
+        if constraints.add?(test) then
+          todo.push test
+          remaining.delete test
+          scheduled = true
+          break
+        end
+      end
+      next if scheduled
+      last_test = done.pop
+      complete += 1
+      constraints.remove(last_test)
+    end
+    while complete < @tests.size do
+      done.pop
+      complete += 1
+    end
+    for thread in threads do
+      thread.kill
+      thread.join
+    end
+  end
+
   private def strip_trailing_slashes(url)
     url = url.dup
     while url.end_with?("/") do url.chop! end
     url
   end
 
-  private def report(msg, success:)
+  private def report(name, msg, success:)
     if success then
-      @successes.append(msg)
+      @successes[name] = msg
     else
-      @failures.append(msg)
+      @failures[name] = msg
     end
   end
 
@@ -283,13 +356,14 @@ class TestRunner
       pid = -1
       status = nil
       Timeout.timeout(timeout) do
-        if testcmd.is_a?(String) then
-          pid = spawn(testenv, testcmd,
-            err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true)
-        else
-          pid = spawn(testenv, [testcmd.first, testcmd.first], *testcmd[1..-1],
-            err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true)
-        end
+        pid =
+          if testcmd.is_a?(String) then
+            spawn(testenv, testcmd,
+              err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true)
+          else
+            spawn(testenv, [ testcmd.first, testcmd.first ], *testcmd[1..-1],
+              err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true)
+          end
         _, status = Process.waitpid2(pid)
       end
       exitcode = status.exitstatus
@@ -343,37 +417,43 @@ class TestRunner
     testsummary << "| #{last_success} | #{first_failure} "
     testsummary << "|"
     @lock.synchronize do
-      report(testsummary, success: exitcode.zero?)
+      report(testname, testsummary, success: exitcode.zero?)
     end
     log << "=== #{verbose_status} at #{stop}\n"
-    return format("Testing: %-19<name>s at %<time>s => %<status>s",
+    puts format("Testing: %-19<name>s at %<time>s => %<status>s",
       name: testname, time: start, status: verbose_status)
   end
 
+  def ordered(results)
+    result = []
+    for test in @tests do
+      result << results[test["name"]] if results[test["name"]]
+    end
+    return result
+  end
+
   def finish_report
+    successes = ordered(@successes)
+    failures = ordered(@failures)
     report = []
     report << "## [Build #{@buildnum}](#{buildurl})\n\n"
     report << "* Started on: #{@start_date}\n"
     report << "* Ended on: #{@end_date}\n\n"
     report << "| Test Name    | Result | Start | Duration | Last Success | First Failure |\n"
     report << "|:-------------|:-------|:------|:---------|:-------------|:--------------|\n"
-    report << "#{@failures.join("\n")}\n" unless @failures.empty?
-    report << "#{@successes.join("\n")}\n" unless @successes.empty?
+    report << "#{failures.join("\n")}\n" unless failures.empty?
+    report << "#{successes.join("\n")}\n" unless successes.empty?
     @report = report.join
     puts "Logs: #{@logurlbase}"
   end
 
-  def testresults_ordered
-    result = []
-    for test in @tests do
-      result << @testresults[test["name"]]
-    end
-    return result
-  end
-
-  def run_all
-    for test in @tests do
-      puts run_test(test)
+  def run_all(parallelize:)
+    if parallelize > 1 then
+      run_tests_in_parallel
+    else
+      for test in @tests do
+        run_test(test)
+      end
     end
     finish_report
     if @repo.path then
@@ -390,7 +470,7 @@ class TestRunner
             "organization" => File.dirname(@repo.path),
             "repo" => File.basename(@repo.path),
             "repourl" => @repo.httpsurl,
-            "tests" => testresults_ordered,
+            "tests" => ordered(@testresults),
           })
         })
     end
@@ -415,7 +495,7 @@ def main
     puts "WARNING: invalid parallelization option"
   end
   testrunner = TestRunner.new(repo, tests)
-  testrunner.run_all
+  testrunner.run_all(parallelize: parallelize)
   exit 1 if testrunner.failed_tests
 end
 
