@@ -3,7 +3,8 @@
 parameters {
     string("JULIA_VERSION", defaultValue: "master")
     string("GAP_VERSION", defaultValue: "master")
-    choice("BUILDTYPE", choices: [ "master", "stable" ], defaultValue: "master")
+    choice("BUILDTYPE", choices: [ "master", "stable", "release" ],
+      defaultValue: "master")
     string("BUILDJOBS", defaultValue: "8")
     choice("REBUILDMODE", choices: [ "normal", "full", "none" ],
         defaultValue: "normal")

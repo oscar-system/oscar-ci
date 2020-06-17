@@ -78,7 +78,7 @@ end
 # packages in order of their dependencies to see if anything
 # breaks if we have the newest packages.
 
-if build_type != "user"
+if build_type != "release"
   packages = toposort(dep_graph(packages))
 end
 
@@ -94,7 +94,7 @@ catch
   # ignore IO errors
 end
 
-if build_type == "user"
+if build_type == "release"
   SafePkg.add_smart("Oscar")
   for pkg in packages
     if pkg != "Oscar"
