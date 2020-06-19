@@ -7,5 +7,5 @@ pkgdir = %x{julia meta/gappkgpath.jl}.chomp
 
 for pkg in packages do
   FileUtils.rm_f "#{pkgdir}/#{pkg}"
-  FileUtils.ln_sf File.realpath(pkg), pkgdir
+  FileUtils.ln_sf File.realpath(pkg), pkgdir or exit 1
 end

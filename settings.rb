@@ -19,3 +19,6 @@ ENV.update({
   "LC_ALL" => "C",
   "TERM" => "dumb"
 })
+def system!(*args, **kw)
+  system(*args, **kw) or exit 1
+end

@@ -4,11 +4,11 @@ require "fileutils"
 
 FileUtils.mkdir_p $JUPYTER_BASE
 
-system "python3", "-m", "venv", $IPYTHON or exit 1
-system "#{$IPYTHON}/bin/pip", "install", "--cache-dir",
-  "#{$JUPYTER_BASE}/.pip-cache", "jupyter", "notebook" or exit 1
+system! "python3", "-m", "venv", $IPYTHON
+system! "#{$IPYTHON}/bin/pip", "install", "--cache-dir",
+  "#{$JUPYTER_BASE}/.pip-cache", "jupyter", "notebook"
 
-system "julia", "meta/install/install-jupyter.jl" or exit 1
+system! "julia", "meta/install/install-jupyter.jl"
 
 jupyter = "#{$IPYTHON}/bin/jupyter"
 FileUtils.ln_sf jupyter, "#{$WORKSPACE}/local/bin"
