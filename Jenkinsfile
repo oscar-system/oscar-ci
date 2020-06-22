@@ -8,6 +8,7 @@ parameters {
     string("BUILDJOBS", defaultValue: "8")
     choice("REBUILDMODE", choices: [ "normal", "full", "none" ],
         defaultValue: "normal")
+    choice("NODE_LABEL", choices: [ "main", "macos" ])
 }
 
 def get(Map args) {
@@ -51,14 +52,19 @@ def updateTimestamp() {
     writeFile(file: timestampFile, text: date)
 }
 
-node {
+node(label: params.NODE_LABEL ?: "master") {
     def workspace = pwd()
     def jenkins_home = env.JENKINS_HOME
     // Docker image to use as build/test environment
     def buildenv = env.OSCAR_CI_IMAGE ?: env.OSCAR_CI_NAME ?: "oscar-ci"
     def run_in_docker = { block ->
-      docker.image(buildenv).inside("--init -v ${jenkins_home}:/var/jenkins_home") {
-	block()
+      if (params.NODE_LABEL == "main") {
+	img = docker.image(buildenv)
+	img.inside("--init -v ${jenkins_home}:/var/jenkins_home") {
+	  block()
+	}
+      } else {
+        block()
       }
     }
     // URLs
