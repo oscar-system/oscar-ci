@@ -52,13 +52,15 @@ def updateTimestamp() {
     writeFile(file: timestampFile, text: date)
 }
 
-node(label: params.NODE_LABEL ?: "master") {
+nodeLabel = params.NODE_LABEL ?: "main"
+
+node(label: nodeLabel) {
     def workspace = pwd()
     def jenkins_home = env.JENKINS_HOME
     // Docker image to use as build/test environment
     def buildenv = env.OSCAR_CI_IMAGE ?: env.OSCAR_CI_NAME ?: "oscar-ci"
     def run_in_docker = { block ->
-      if (params.NODE_LABEL == "main") {
+      if (nodeLabel == "main") {
 	img = docker.image(buildenv)
 	img.inside("--init -v ${jenkins_home}:/var/jenkins_home") {
 	  block()
