@@ -2,6 +2,7 @@
 require_relative "../settings.rb"
 require "fileutils"
 
+FileUtils.rm_rf $JUPYTER_BASE
 FileUtils.mkdir_p $JUPYTER_BASE
 
 system! "python3", "-m", "venv", $IPYTHON
