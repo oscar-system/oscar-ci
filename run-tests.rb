@@ -478,6 +478,19 @@ class TestRunner
 
 end
 
+def get_par_info(parallelize)
+  case parallelize
+  when nil, false, true then
+    parallelize ? (ENV["BUILDJOBS"] || 4).to_i : 0
+  when Integer then
+    [ parallelize, 0 ].max
+  when Hash then
+    value = parallelize[ENV["JOB_NAME"]]
+    value ||= parallelize["default"]
+    value ||= (ENV["BUILDJOBS"] || 4).to_i
+  end
+end
+
 def main
   FileUtils.mkdir_p "logs"
   config = YAML.safe_load(File.read("meta/tests/config.yaml"))
@@ -485,15 +498,7 @@ def main
     ENV["CREDENTIALS"] || "/config/credentials.yaml")
   repo = GitRepo.new(github, ENV["JOB_NAME"])
   tests = config["tests"]
-  parallelize = config["parallelize"]
-  case parallelize
-  when false, true then
-    parallelize = parallelize.to_i
-  when Integer then
-    # do nothing
-  else
-    puts "WARNING: invalid parallelization option"
-  end
+  parallelize = get_par_info(config["parallelize"])
   testrunner = TestRunner.new(repo, tests)
   testrunner.run_all(parallelize: parallelize)
   exit 1 if testrunner.failed_tests
