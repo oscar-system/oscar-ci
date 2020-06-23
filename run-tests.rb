@@ -13,8 +13,19 @@ class GitServer
   def initialize(sshbase, httpsbase, credfile)
     @sshbase = sshbase
     @httpsbase = httpsbase
-    @credentials = File.open(credfile) do | fp |
-      YAML.safe_load(fp.read)
+    begin
+      @credentials = File.open(credfile) do | fp |
+        YAML.safe_load(fp.read)
+      end
+    rescue
+      @credentials = {}
+      File.open(".gitlog", "a") do | fp |
+        fp.puts(YAML.dump({
+          "time" => Time.now.to_s,
+          "info" => "missing or unreadable credentials file",
+          "file" => credfile
+        }))
+      end
     end
   end
 
