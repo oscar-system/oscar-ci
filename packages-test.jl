@@ -1,3 +1,5 @@
+using Pkg
+
 include("packages.jl")
 
 failed = []
@@ -14,6 +16,10 @@ for package in packages
   end
 end
 
+
+println("=== Package Status")
+Pkg.status()
+println()
 if length(failed) > 0
   println("The following packages failed to load:")
   for package in failed
