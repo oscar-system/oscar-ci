@@ -86,10 +86,8 @@ end
 # This is used by the CheckPackages test during the test stage
 # to display dependency errors.
 
-pkglog = ".pkgerrors"
-
 try
-  close(open(pkglog, "w"))
+  close(open(SafePkg.pkglog, "w"))
 catch
   # ignore IO errors
 end

@@ -16,12 +16,16 @@ module SafePkg
   Stable(name) = get(locations, name, PackageSpec(name=name))
   GetPackageSpec(name) = mode == stable ? Stable(name) : Master(name)
 
-  function LogPkgErr(err)
-    msg = replace(replace(replace(err.msg,
-      r"├|└" => "+"), r"─" => "-"), r"│" => "|")
+  global pkglog = ".pkgerrors"
+
+  function LogPkgErr(err, name = nothing)
     try
+      msg = replace(replace(replace(err.msg,
+	r"├|└" => "+"), r"─" => "-"), r"│" => "|")
       open(pkglog, "a") do fp
-	write(fp, string("=== failed to add package ", name, "\n"))
+	if name !== nothing
+	  write(fp, string("=== failed to add package ", name, "\n"))
+	end
 	write(fp, string(msg, "\n"))
       end
     catch
@@ -44,7 +48,8 @@ module SafePkg
   end
 
   function add_smart(name)
-    Safe(()->Pkg.add(GetPackageSpec(name)); onerror = err -> LogPkgErr(err))
+    Safe(()->Pkg.add(GetPackageSpec(name));
+         onerror = err -> LogPkgErr(err, name))
   end
 
   function add(pkg)
