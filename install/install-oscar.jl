@@ -3,33 +3,26 @@ using Pkg
 include("../packages.jl")
 include("../safepkg.jl")
 
-# BUILDTYPE has three possible settings: master, stable, and user
+# BUILDTYPE has three possible settings: develop, master, and stable
 #
-# The master build will use master branch versions of all packages
-# where available.
+# The master and develop builds will use master branch versions.
 #
 # The stable build will instead use published versions where available.
 #
-# Both master and stable builds will parse the dependency graph and
-# add packages in bottom-up order. This will trigger errors that
-# would not show by a simple Pkg.add("Oscar"), which will downgrade
-# dependent packages if necessary.
-#
-# Why do we this? Because a user may have done a Pkg.add("GAP"), say,
-# and then runs into problems with Pkg.add("Oscar") later.
-#
-# The user build will instead simply install Oscar first and then
-# all dependent packages. This is the typical process with a clean
-# ~/.julia setup.
+# For master and stable builds, packages will be added before their
+# dependencies. For develop builds, packages will be added after their
+# dependencies. The latter makes sure that for each package the newest
+# version is tested, but can result in subsequent packages not being
+# added due to requirements failures.
 
 build_type = get(ENV, "BUILDTYPE", "master")
 
-SafePkg.set_mode(build_type == "master" ? SafePkg.master : SafePkg.stable)
+SafePkg.set_mode(build_type == "stable" ? SafePkg.stable : SafePkg.master)
 
 # Topological sort of dependencies.
 # Any cycles are appended to the graph "as is".
 
-function toposort(graph::Dict{T, Set{T}})::Vector{T} where T
+function toposort(graph::Dict{T, Set{T}}; topdown = false)::Vector{T} where T
   graph = copy(graph)
   vertices = keys(graph)
   for (v, e) in graph
@@ -57,7 +50,7 @@ function toposort(graph::Dict{T, Set{T}})::Vector{T} where T
   end
   # add any cycles
   append!(out, keys(graph))
-  return out
+  return topdown ? out : reverse(out)
 end
 
 function dep_graph(pkgs::Array{String,1})
@@ -78,9 +71,7 @@ end
 # packages in order of their dependencies to see if anything
 # breaks if we have the newest packages.
 
-if build_type != "release"
-  packages = toposort(dep_graph(packages))
-end
+packages = toposort(dep_graph(packages); topdown = build_type != "develop")
 
 # Create an empty log to record errors.
 # This is used by the CheckPackages test during the test stage
@@ -92,7 +83,7 @@ catch
   # ignore IO errors
 end
 
-if build_type == "release"
+if build_type != "develop"
   SafePkg.add_smart("Oscar")
   for pkg in packages
     if pkg != "Oscar"
