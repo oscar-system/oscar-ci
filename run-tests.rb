@@ -177,7 +177,7 @@ class TestRunner
     @successes = {}
     @failures = {}
     @testresults = {}
-    @jenkinshome = ENV["JENKINS_HOME"] || "/var/jenkins_home"
+    @jenkinshome = File.expand_path("#{$WORKSPACE}/../..")
     @jobstatepath = "#{@jenkinshome}/jobstate/#{@job}.yaml"
     FileUtils.mkdir_p(File.dirname(@jobstatepath))
     @jobstate = YAML::Store.new(@jobstatepath)

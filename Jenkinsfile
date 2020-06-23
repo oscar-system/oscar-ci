@@ -62,7 +62,7 @@ node(label: nodeLabel) {
     def run_in_docker = { block ->
       if (nodeLabel == "main") {
 	img = docker.image(buildenv)
-	img.inside("--init -v ${jenkins_home}:/var/jenkins_home") {
+	img.inside("--init -v ${jenkins_home}:${jenkins_home}") {
 	  block()
 	}
       } else {
