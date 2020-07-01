@@ -12,7 +12,7 @@ module SafePkg
     mode = m
   end
 
-  Master(name) = PackageSpec(path=string(name, ".jl"))
+  Master(name) = get(locations, name, PackageSpec(path=string(name, ".jl")))
   Stable(name) = get(locations, name, PackageSpec(name=name))
   GetPackageSpec(name) = mode == stable ? Stable(name) : Master(name)
 
