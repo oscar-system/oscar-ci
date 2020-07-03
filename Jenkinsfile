@@ -93,7 +93,7 @@ node(label: nodeLabel) {
 		    branch: julia_version
 		get url: "https://github.com/gap-system/gap",
 		    branch: gap_version
-		get url: "https://github.com/singular/sources",
+		get url: "https://github.com/Singular/Singular",
 		    dir: "singular", branch: "spielwiese"
 		get url: "https://github.com/oscar-system/GAP.jl"
                 get url: "https://github.com/Nemocas/AbstractAlgebra.jl"
