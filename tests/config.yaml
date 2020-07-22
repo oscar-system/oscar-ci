@@ -103,3 +103,7 @@ tests:
   notebook: notebooks-groebner/GroebnerBasis.ipynb
   timeout: 300
   uses: notebook
+- name: AlgebraicGeometry.ipynb
+  notebook: notebooks/AlgebraicGeometry.ipynb
+  timeout: 300
+  uses: notebook
