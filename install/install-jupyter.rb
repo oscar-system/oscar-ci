@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
-require_relative "../settings.rb"
-require "fileutils"
+require_relative "../settings"
+require_relative "../utils"
 
-FileUtils.rm_rf $JUPYTER_BASE
+FileUtils.rm_tree $JUPYTER_BASE
 FileUtils.mkdir_p $JUPYTER_BASE
 
 system! "python3", "-m", "venv", $IPYTHON

@@ -1,13 +1,12 @@
 #!/usr/bin/env ruby
 
-require "fileutils"
 require "timeout"
 require "yaml"
 require "yaml/store"
 require "open3"
 
-require_relative "settings.rb"
-require_relative "settings.rb"
+require_relative "settings"
+require_relative "utils"
 
 class GitServer
   def initialize(sshbase, httpsbase, credfile)
@@ -80,7 +79,7 @@ class GitRepo
       git("remote", "set-url", "origin", "--", @sshurl)
       git("pull", "--ff-only", "origin", "master")
     else
-      FileUtils.rm_rf("report.tmp")
+      FileUtils.rm_tree("report.tmp")
       git("clone", @sshurl, "report.tmp", autocd: false)
       git("-C", "report.tmp", "config",
         "--local", "user.email", "oscar@computeralgebra.de", autocd: false)
@@ -359,7 +358,7 @@ class TestRunner
       log << "=== #{testname} at #{start_short}\n"
       testcmd = test_command(test)
       polymake_user_dir = "#{$WORKSPACE}/.polymake/#{testfilename}"
-      FileUtils.rm_rf(polymake_user_dir)
+      FileUtils.rm_tree(polymake_user_dir)
       FileUtils.mkdir_p(polymake_user_dir)
       testenv = {
         "POLYMAKE_USER_DIR" => polymake_user_dir

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-require_relative "../settings.rb"
-require "fileutils"
+require_relative "../settings"
+require_relative "../utils"
 
-FileUtils.rm_rf $JULIA_ENV
+FileUtils.rm_tree $JULIA_ENV
 system! "julia", "meta/install/install-oscar.jl"
