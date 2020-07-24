@@ -21,5 +21,5 @@ locations = Dict(
 
 notebook_packages = [
   "ImplicitPlots", "Plots", "HomotopyContinuation",
-  PackageSpec(path="notebooks-gitfans")
+  PackageSpec(path="notebooks-gitfans"), "lib4ti2_jll"
 ]
