@@ -107,3 +107,7 @@ tests:
   notebook: notebooks/AlgebraicGeometry.ipynb
   timeout: 300
   uses: notebook
+- name: DivFreeNotIndFree.ipynb
+  notebook: notebooks-homalg/DivFreeNotIndFree.ipynb
+  timeout: 300
+  uses: notebook homalg gap
