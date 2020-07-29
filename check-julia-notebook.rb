@@ -2,7 +2,8 @@
 require_relative "settings.rb"
 require "json"
 
-env = { "LC_ALL" => "en_US.UTF-8" }
+encoding = "en_US.UTF-8"
+env = { "LC_ALL" => encoding, "LC_CTYPE" => encoding, "LANGUAGE" => encoding }
 notebook = ARGV.shift
 basename = File.basename(notebook)
 kernel = nil

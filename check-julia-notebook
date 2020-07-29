@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e
+# Notebooks should run with a UTF locale
+export LC_ALL=en_US.UTF-8
+export LC_CTYPE=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
 meta/jupyter-julia "$1"
 echo "=== notebook diff for $(basename "$1")"
-export LC_ALL=en_US.UTF-8
 # Temporarily silence errors
 meta/nb-diff -w "$1" "notebooks-out/$(basename "$1")" || true
