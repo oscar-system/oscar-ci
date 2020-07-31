@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
   automake \
   cmake \
   curl \
+  cython \
+  cython3 \
   dnsutils \
   g++ \
   gcc \
