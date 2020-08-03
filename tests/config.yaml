@@ -111,3 +111,11 @@ tests:
   notebook: notebooks-homalg/DivFreeNotIndFree.ipynb
   timeout: 300
   uses: notebook homalg gap
+- name: hom_vr_complexes.ipynb
+  notebook: notebooks/homology_of_vr_complexes.ipynb
+  timeout: 300
+  uses: notebook polymake
+- name: persistent_hom_vr.ipynb
+  notebook: notebooks/persistent_homology_of_vr_complexes_and_visualizations.ipynb
+  timeout: 300
+  uses: notebook polymake
