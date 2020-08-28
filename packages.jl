@@ -14,7 +14,8 @@ packages = [
 locations = Dict(
   "LoadFlint" => PackageSpec(name="LoadFlint"),
   "Nemo" => PackageSpec(name="Nemo"),
-  "GroupAtlas" => PackageSpec(path="GroupAtlas.jl")
+  "GroupAtlas" => PackageSpec(path="GroupAtlas.jl"),
+  "GAP" => PackageSpec(url="https://github.com/rbehrends/GAP.jl"; rev="test")
 )
 
 # Additional packages needed by notebooks.

@@ -71,7 +71,7 @@ node(label: nodeLabel) {
     }
     // URLs
     def metarepo =
-      env.OSCAR_CI_REPO ?: "https://github.com/oscar-system/oscar-ci"
+      env.OSCAR_CI_REPO ?: "https://github.com/rbehrends/oscar-ci"
 
     // parameters
     def julia_version = "${params.JULIA_VERSION}"
@@ -85,7 +85,7 @@ node(label: nodeLabel) {
                 cleanWs disableDeferredWipeout: true, deleteDirs: true
             }
 	    updateTimestamp()
-	    get url: metarepo, dir: "meta"
+	    get url: metarepo, dir: "meta", branch: "test"
 	    sh "meta/prepare.rb"
             // Update repositories
             if (rebuild != "none") {
@@ -95,7 +95,7 @@ node(label: nodeLabel) {
 		    branch: gap_version
 		get url: "https://github.com/Singular/Singular",
 		    dir: "singular", branch: "spielwiese"
-		get url: "https://github.com/oscar-system/GAP.jl"
+		get url: "https://github.com/rbehrends/GAP.jl"
                 get url: "https://github.com/Nemocas/AbstractAlgebra.jl"
 		get url: "https://github.com/Nemocas/Nemo.jl"
                 get url: "https://github.com/thofma/Hecke.jl"

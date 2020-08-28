@@ -24,9 +24,9 @@ tests:
   uses: gap
 - name: Nemo.jl
   package: Nemo
-- name: Hecke.jl
-  package: Hecke
-  timeout: 3600
+# - name: Hecke.jl
+#  package: Hecke
+#  timeout: 3600
 - name: AbstractAlgebra.jl
   package: AbstractAlgebra
 - name: Singular.jl
@@ -49,73 +49,73 @@ tests:
   uses: gap
 - name: Oscar.jl
   package: Oscar
-- name: NemoLinearAlgebraForCAP
-  sh: 'make -C "$(julia meta/gappkgpath.jl)"/NemoLinearAlgebraForCAP test'
-- name: AbstractAlgebra.ipynb
-  notebook: notebooks/AbstractAlgebra.ipynb
-  timeout: 300
-  uses: notebook
-- name: CohP1.ipynb
-  notebook: notebooks-homalg/CohP1.ipynb
-  timeout: 300
-  uses: notebook homalg gap
-- name: TiltingEquivalence.ipynb
-  notebook: notebooks-homalg/TiltingEquivalence.ipynb
-  timeout: 300
-  uses: notebook homalg gap
-- name: Hecke.ipynb
-  notebook: notebooks/Hecke.ipynb
-  timeout: 300
-  uses: notebook
-- name: Singular.ipynb
-  notebook: notebooks/Singular.ipynb
-  timeout: 300
-  uses: notebook
-- name: g-vectors.ipynb
-  notebook: notebooks-polymake/polymake/g-vectors_of_random_simplicial_6-polytopes.ipynb
-  timeout: 900
-  uses: notebook polymake
-- name: K3-16.ipynb
-  notebook: notebooks-polymake/polymake/K3-16.ipynb
-  timeout: 900
-  uses: notebook polymake
-- name: c-automorphisms.ipynb
-  notebook: notebooks-polymake/MPI-demo-200124/combinatorial-automorphisms.ipynb
-  timeout: 900
-  uses: notebook polymake
-- name: wronski-poly.ipynb
-  notebook: notebooks-polymake/MPI-demo-200124/wronski-polynomials.ipynb
-  timeout: 900
-  uses: notebook polymake
-- name: Tropicalization.ipynb
-  notebook: notebooks-polymake/patchworking/Tropicalization.ipynb
-  timeout: 900
-  uses: notebook polymake
-- name: "uMPS(2,2,4)_0dim.ipynb"
-  notebook: "notebooks-homalg/uMPS(2,2,4)_0dim.ipynb"
-  timeout: 300
-  uses: notebook homalg gap
-- name: GITFans.ipynb
-  notebook: notebooks-gitfans/ipynb/GITFans.ipynb
-  timeout: 300
-  uses: notebook polymake gap
-- name: GroebnerBasis.ipynb
-  notebook: notebooks-groebner/GroebnerBasis.ipynb
-  timeout: 300
-  uses: notebook
-- name: AlgebraicGeometry.ipynb
-  notebook: notebooks/AlgebraicGeometry.ipynb
-  timeout: 300
-  uses: notebook
-- name: DivFreeNotIndFree.ipynb
-  notebook: notebooks-homalg/DivFreeNotIndFree.ipynb
-  timeout: 300
-  uses: notebook homalg gap
-- name: hom_vr_complexes.ipynb
-  notebook: notebooks/homology_of_vr_complexes.ipynb
-  timeout: 300
-  uses: notebook polymake
-- name: persistent_hom_vr.ipynb
-  notebook: notebooks/persistent_homology_of_vr_complexes_and_visualizations.ipynb
-  timeout: 300
-  uses: notebook polymake
+# - name: NemoLinearAlgebraForCAP
+#   sh: 'make -C "$(julia meta/gappkgpath.jl)"/NemoLinearAlgebraForCAP test'
+# - name: AbstractAlgebra.ipynb
+#   notebook: notebooks/AbstractAlgebra.ipynb
+#   timeout: 300
+#   uses: notebook
+# - name: CohP1.ipynb
+#   notebook: notebooks-homalg/CohP1.ipynb
+#   timeout: 300
+#   uses: notebook homalg gap
+# - name: TiltingEquivalence.ipynb
+#   notebook: notebooks-homalg/TiltingEquivalence.ipynb
+#   timeout: 300
+#   uses: notebook homalg gap
+# - name: Hecke.ipynb
+#   notebook: notebooks/Hecke.ipynb
+#   timeout: 300
+#   uses: notebook
+# - name: Singular.ipynb
+#   notebook: notebooks/Singular.ipynb
+#   timeout: 300
+#   uses: notebook
+# - name: g-vectors.ipynb
+#   notebook: notebooks-polymake/polymake/g-vectors_of_random_simplicial_6-polytopes.ipynb
+#   timeout: 900
+#   uses: notebook polymake
+# - name: K3-16.ipynb
+#   notebook: notebooks-polymake/polymake/K3-16.ipynb
+#   timeout: 900
+#   uses: notebook polymake
+# - name: c-automorphisms.ipynb
+#   notebook: notebooks-polymake/MPI-demo-200124/combinatorial-automorphisms.ipynb
+#   timeout: 900
+#   uses: notebook polymake
+# - name: wronski-poly.ipynb
+#   notebook: notebooks-polymake/MPI-demo-200124/wronski-polynomials.ipynb
+#   timeout: 900
+#   uses: notebook polymake
+# - name: Tropicalization.ipynb
+#   notebook: notebooks-polymake/patchworking/Tropicalization.ipynb
+#   timeout: 900
+#   uses: notebook polymake
+# - name: "uMPS(2,2,4)_0dim.ipynb"
+#   notebook: "notebooks-homalg/uMPS(2,2,4)_0dim.ipynb"
+#   timeout: 300
+#   uses: notebook homalg gap
+# - name: GITFans.ipynb
+#   notebook: notebooks-gitfans/ipynb/GITFans.ipynb
+#   timeout: 300
+#   uses: notebook polymake gap
+# - name: GroebnerBasis.ipynb
+#   notebook: notebooks-groebner/GroebnerBasis.ipynb
+#   timeout: 300
+#   uses: notebook
+# - name: AlgebraicGeometry.ipynb
+#   notebook: notebooks/AlgebraicGeometry.ipynb
+#   timeout: 300
+#   uses: notebook
+# - name: DivFreeNotIndFree.ipynb
+#   notebook: notebooks-homalg/DivFreeNotIndFree.ipynb
+#   timeout: 300
+#   uses: notebook homalg gap
+# - name: hom_vr_complexes.ipynb
+#   notebook: notebooks/homology_of_vr_complexes.ipynb
+#   timeout: 300
+#   uses: notebook polymake
+# - name: persistent_hom_vr.ipynb
+#   notebook: notebooks/persistent_homology_of_vr_complexes_and_visualizations.ipynb
+#   timeout: 300
+#   uses: notebook polymake
