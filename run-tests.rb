@@ -12,12 +12,10 @@ class GitServer
   def initialize(sshbase, httpsbase, credfile)
     @sshbase = sshbase
     @httpsbase = httpsbase
+    @credentials = {}
     begin
-      @credentials = File.open(credfile) do | fp |
-        YAML.safe_load(fp.read)
-      end
+      @credentials = YAML.safe_load(File.read(credfile))
     rescue
-      @credentials = {}
       File.open(".gitlog", "a") do | fp |
         fp.puts(YAML.dump({
           "time" => Time.now.to_s,
