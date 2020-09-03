@@ -9,6 +9,7 @@ parameters {
     choice("REBUILDMODE", choices: [ "normal", "full", "none" ],
         defaultValue: "normal")
     choice("NODE_LABEL", choices: [ "main", "macos" ])
+    choice("DOCKERIZE", choices: [ "yes", "no" ])
 }
 
 def get(Map args) {
@@ -60,7 +61,7 @@ node(label: nodeLabel) {
     // Docker image to use as build/test environment
     def buildenv = env.OSCAR_CI_IMAGE ?: env.OSCAR_CI_NAME ?: "oscar-ci"
     def run_in_docker = { block ->
-      if (nodeLabel == "main") {
+      if (nodeLabel in [ "main", "master" ] && params.DOCKERIZE != "no") {
 	img = docker.image(buildenv)
 	img.inside("--init -v ${jenkins_home}:${jenkins_home}") {
 	  block()
