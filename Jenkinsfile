@@ -24,7 +24,7 @@ def get(Map args) {
     } else if (args.scm == "git" || args.scm == null) {
 	rev = args.branch ?: "master"
 	if (rev.startsWith("tag:"))
-	   rev = "refs/tags/" + rev[4..-1]
+	   rev = "refs/tags/" + rev["tag:".length()..-1]
 	checkout([$class: "GitSCM",
 	    userRemoteConfigs: [[url: url]],
 	    branches: [[name: rev]],
@@ -90,8 +90,13 @@ node(label: nodeLabel) {
 	    sh "meta/prepare.rb"
             // Update repositories
             if (rebuild != "none") {
-		get url: "https://github.com/julialang/julia",
-		    branch: julia_version
+		if (julia_version.startsWith("download:")) {
+		    raw_julia_version = julia_version["download:".length()..-1]
+		    sh "meta/download-julia.rb $raw_julia_version"
+		} else {
+		    get url: "https://github.com/julialang/julia",
+			branch: julia_version
+		}
 		get url: "https://github.com/gap-system/gap",
 		    branch: gap_version
 		get url: "https://github.com/Singular/Singular",

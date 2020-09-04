@@ -2,5 +2,7 @@
 require_relative "../settings.rb"
 require "fileutils"
 
-system! "make -C julia -j#{ENV['BUILDJOBS'] || 4}"
-FileUtils.ln_sf "#{$WORKSPACE}/julia/julia", "local/bin" or exit 1
+if not (ENV["JULIA_VERSION"] || "").start_with?("download:") then
+  system! "make -C julia -j#{ENV['BUILDJOBS'] || 4}"
+end
+FileUtils.ln_sf "#{$WORKSPACE}/julia/bin/julia", "local/bin" or exit 1
