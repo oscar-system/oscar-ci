@@ -5,4 +5,9 @@ require "fileutils"
 if not (ENV["JULIA_VERSION"] || "").start_with?("download:") then
   system! "make -C julia -j#{ENV['BUILDJOBS'] || 4}"
 end
-FileUtils.ln_sf "#{$WORKSPACE}/julia/bin/julia", "local/bin" or exit 1
+for binary in [ "julia/julia", "julia/bin/julia"] do
+  path = "#{$WORKSPACE}/#{binary}"
+  if File.exist? path then
+    FileUtils.ln_sf path, "local/bin" or exit 1
+  end
+end
