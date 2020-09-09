@@ -377,15 +377,16 @@ class TestRunner
       pid = -1
       status = nil
       Timeout.timeout(timeout) do
-        pid = Dir.chdir(testdir) do
+        pid =
           if testcmd.is_a?(String) then
             spawn(testenv, testcmd,
-              err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true)
+              err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true,
+              chdir: testdir)
           else
             spawn(testenv, [ testcmd.first, testcmd.first ], *testcmd[1..-1],
-              err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true)
+              err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true,
+              chdir: testdir)
           end
-        end
         _, status = Process.waitpid2(pid)
       end
       exitcode = status.exitstatus
