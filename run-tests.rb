@@ -316,9 +316,13 @@ class TestRunner
     return last_success, first_failure
   end
 
+  def wspath(path)
+    File.expand_path(path, $WORKSPACE)
+  end
+
   private def test_command(test)
     if test["script"] then
-      %Q{meta/tests/#{test["script"]}}
+      wspath(%Q{meta/tests/#{test["script"]}})
     elsif test["sh"] then
       test["sh"]
     elsif test["julia"] then
@@ -331,7 +335,8 @@ class TestRunner
       gapcode = %Q{Read(Filename(DirectoriesPackageLibrary("#{test["gappkg"]}", "tst"), "testall.g"));}
       %w{gap --quitonbreak -c} + [ gapcode ]
     elsif test["notebook"] then
-      [ "ruby", "meta/check-julia-notebook.rb", test["notebook"] ]
+      [ "ruby", wspath("meta/check-julia-notebook.rb"),
+        wspath(test["notebook"]) ]
     else
       fail "invalid test type" # TODO
     end
