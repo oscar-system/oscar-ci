@@ -179,6 +179,7 @@ class TestRunner
     FileUtils.mkdir_p(File.dirname(@jobstatepath))
     @jobstate = YAML::Store.new(@jobstatepath)
     @lock = Thread::Mutex.new
+    @builddir = Dir.pwd
   end
 
   class Constraints
@@ -355,6 +356,18 @@ class TestRunner
       start_short = start_time.strftime("%H:%M")
       log << "=== #{testname} at #{start_short}\n"
       testcmd = test_command(test)
+      juliaenv = "#{$WORKSPACE}/julia-env"
+      if test["standalone"] == true then
+        testdir = "#{$WORKSPACE}/test-env/#{testfilename}"
+        FileUtils.rm_tree(testdir)
+        FileUtils.mkdir_p(testdir)
+        FileUtils.cp File.join(juliaenv, "Project.toml"),
+          File.join(testdir, "Project.toml") rescue nil
+        FileUtils.cp File.join(juliaenv, "Manifest.toml"),
+          File.join(testdir, "Manifest.toml") rescue nil
+      else
+        testdir = "."
+      end
       polymake_user_dir = "#{$WORKSPACE}/.polymake/#{testfilename}"
       FileUtils.rm_tree(polymake_user_dir)
       FileUtils.mkdir_p(polymake_user_dir)
@@ -364,7 +377,7 @@ class TestRunner
       pid = -1
       status = nil
       Timeout.timeout(timeout) do
-        pid =
+        pid = Dir.chdir(testdir) do
           if testcmd.is_a?(String) then
             spawn(testenv, testcmd,
               err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true)
@@ -372,6 +385,7 @@ class TestRunner
             spawn(testenv, [ testcmd.first, testcmd.first ], *testcmd[1..-1],
               err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true)
           end
+        end
         _, status = Process.waitpid2(pid)
       end
       exitcode = status.exitstatus
