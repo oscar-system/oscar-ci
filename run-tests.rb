@@ -8,6 +8,23 @@ require "open3"
 require_relative "settings"
 require_relative "utils"
 
+def parse_mem(data)
+  case data
+  when Integer, nil then
+    data
+  when /^([0-9]+)$/ then
+    $1.to_i
+  when /^([0-9]+)[kK]$/ then
+    $1.to_i * 1024
+  when /^([0-9]+)[mM]$/ then
+    $1.to_i * 1024 * 1024
+  when /^([0-9]+)[gG]$/ then
+    $1.to_i * 1024 * 1024 * 1024
+  else
+    nil
+  end
+end
+
 class GitServer
   def initialize(sshbase, httpsbase, credfile)
     @sshbase = sshbase
@@ -475,7 +492,10 @@ class TestRunner
     puts "Logs: #{@logurlbase}"
   end
 
-  def run_all(parallelize:)
+  def run_all(parallelize:, memlimit: nil)
+    if memlimit then
+      Process.setrlimit(:DATA, memlimit, memlimit)
+    end
     if parallelize > 1 then
       run_tests_in_parallel
     else
@@ -513,22 +533,26 @@ def get_par_info(parallelize)
   when Integer then
     [ parallelize, 0 ].max
   when Hash then
-    value = parallelize[ENV["JOB_NAME"]]
-    value ||= parallelize["default"]
+    value = parallelize
     value ||= (ENV["BUILDJOBS"] || 4).to_i
   end
 end
 
 def main
   FileUtils.mkdir_p "logs"
+  jobname = ENV["JOB_NAME"]
   config = YAML.safe_load(File.read("meta/tests/config.yaml"))
+  if config["jobinfo"] then
+    config.update(config["jobinfo"][jobname] || {})
+  end
   github = GitServer.new("ssh://git@github.com", "https://github.com",
     ENV["CREDENTIALS"] || "/config/credentials.yaml")
-  repo = GitRepo.new(github, ENV["JOB_NAME"])
+  repo = GitRepo.new(github, jobname)
   tests = config["tests"]
   parallelize = get_par_info(config["parallelize"])
+  memlimit = parse_mem(config["memlimit"])
   testrunner = TestRunner.new(repo, tests)
-  testrunner.run_all(parallelize: parallelize)
+  testrunner.run_all(parallelize: parallelize, memlimit: memlimit)
   exit 1 if testrunner.failed_tests
 end
 

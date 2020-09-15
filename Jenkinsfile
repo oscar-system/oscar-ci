@@ -60,7 +60,7 @@ node(label: nodeLabel) {
     def jenkins_home = env.JENKINS_HOME
     // Docker image to use as build/test environment
     def buildenv = env.OSCAR_CI_IMAGE ?: env.OSCAR_CI_NAME ?: "oscar-ci"
-    def run_in_docker = { block ->
+    def run_in_testenv = { block ->
       if (nodeLabel in [ "main", "master" ] && params.DOCKERIZE != "no") {
 	img = docker.image(buildenv)
 	img.inside("--init -v ${jenkins_home}:${jenkins_home}") {
@@ -130,7 +130,7 @@ node(label: nodeLabel) {
         }
         stage('Build') {
             if (rebuild != "none") {
-	        run_in_docker {
+	        run_in_testenv {
 		    sh "meta/install/install-julia.rb"
 		    sh "meta/install/install-oscar.rb"
 		    sh "meta/install/install-jupyter.rb"
@@ -144,7 +144,7 @@ node(label: nodeLabel) {
             }
         }
         stage('Test') {
-	    run_in_docker {
+	    run_in_testenv {
 		sh "meta/run-tests.rb"
 	    }
         }

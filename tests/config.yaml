@@ -1,4 +1,8 @@
 # parallelize: Whether to run tests in parallel.
+# memlimit: This is the maximum amount of heap memory that a test may
+#   use. This setting currently only works on Linux.
+# jobinfo: Job-specific settings for parallelize and memlimit to override
+#   the defaults.
 # tests: Array of records with fields:
 # name: Human readable name of the test.
 # script: Filename of a shell script in the tests/ directory that
@@ -10,9 +14,15 @@
 #   with any other test. Every test also implicitly uses its test as a
 #   resource. Thus, you can prevent one test from being run concurrently
 #   with another by adding the other test's name to the 'uses' entry.
-parallelize:
-  default: 6
-  oscar-macos: 1
+parallelize: 6
+jobinfo:
+  oscar-macos:
+    parallelize: 1
+  oscar-arm:
+    parallelize: 1
+    memlimit: 2G
+  oscar-local:
+    memlimit: 2G
 tests:
 - name: CheckPackages
   script: test-packages.sh
