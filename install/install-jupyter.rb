@@ -9,8 +9,9 @@ virtualenv_url = "https://bootstrap.pypa.io/virtualenv.pyz"
 
 Dir.chdir($WORKSPACE) do
   system! *%w{wget -t 5 -N --no-if-modified-since}, virtualenv_url
-  system! "python3", File.basename(virtualenv_url), $IPYTHON
 end
+system! "python3", File.join($WORKSPACE, File.basename(virtualenv_url)),
+  $IPYTHON
 system! "#{$IPYTHON}/bin/pip", "install", "--cache-dir",
   "#{$JUPYTER_BASE}/.pip-cache", "jupyter", "notebook"
 
