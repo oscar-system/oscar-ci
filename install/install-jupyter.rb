@@ -5,7 +5,12 @@ require_relative "../utils"
 FileUtils.rm_tree $JUPYTER_BASE
 FileUtils.mkdir_p $JUPYTER_BASE
 
-system! *%w{python3 -m venv --system-site-packages}, $IPYTHON
+virtualenv_url = "https://bootstrap.pypa.io/virtualenv.pyz"
+
+Dir.chdir($WORKSPACE) do
+  system! *%w{wget -t 5 -N --no-if-modified-since}, virtualenv_url
+  system! "python3", File.basename(virtualenv_url), $IPYTHON
+end
 system! "#{$IPYTHON}/bin/pip", "install", "--cache-dir",
   "#{$JUPYTER_BASE}/.pip-cache", "jupyter", "notebook"
 
