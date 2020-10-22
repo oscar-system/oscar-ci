@@ -7,6 +7,7 @@ Hecke.jl: https://github.com/thofma/Hecke.jl
 AbstractAlgebra.jl: https://github.com/Nemocas/AbstractAlgebra.jl
 Singular.jl: https://github.com/oscar-system/Singular.jl
 HomalgProject.jl: https://github.com/homalg-project/HomalgProject.jl
+CapAndHomalg.jl: https://github.com/homalg-project/CapAndHomalg.jl
 Polymake.jl: https://github.com/oscar-system/Polymake.jl
 GroupAtlas.jl: https://github.com/oscar-system/GroupAtlas.jl
 JuliaInterface: https://github.com/oscar-system/GAP.jl

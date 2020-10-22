@@ -4,8 +4,8 @@ using Pkg
 
 packages = [
   "GAP", "AbstractAlgebra", "Nemo", "Hecke", "LoadFlint",
-  "Singular", "Polymake", "HomalgProject", "GroupAtlas",
-  "GroebnerBasis", "Oscar"
+  "Singular", "Polymake", "HomalgProject", "CapAndHomalg",
+  "GroupAtlas", "GroebnerBasis", "Oscar",
 ]
 
 # The locations dictionary overrides where packages are normally

@@ -44,6 +44,9 @@ tests:
 - name: HomalgProject.jl
   package: HomalgProject
   uses: homalg gap
+- name: CapAndHomalg.jl
+  package: CapAndHomalg
+  uses: homalg gap
 - name: Polymake.jl
   package: Polymake
   uses: polymake

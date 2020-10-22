@@ -109,6 +109,7 @@ node(label: nodeLabel) {
                 get url: "https://github.com/oscar-system/Singular.jl"
 		get url: "https://github.com/oscar-system/Polymake.jl"
 		get url: "https://github.com/homalg-project/HomalgProject.jl"
+		get url: "https://github.com/homalg-project/CapAndHomalg.jl"
 		get url: "https://github.com/oscar-system/GroupAtlas.jl"
 		get url: "https://github.com/ederc/GroebnerBasis.jl"
 		get url: "https://github.com/oscar-system/Oscar.jl"
