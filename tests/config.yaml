@@ -106,11 +106,11 @@ tests:
   uses: notebook polymake
 - name: "uMPS(2,2,4)_0dim.ipynb"
   notebook: "notebooks-homalg/uMPS(2,2,4)_0dim.ipynb"
-  timeout: 300
+  timeout: 600
   uses: notebook homalg gap
 - name: GITFans.ipynb
   notebook: notebooks-gitfans/ipynb/GITFans.ipynb
-  timeout: 300
+  timeout: 600
   uses: notebook polymake gap
 - name: GroebnerBasis.ipynb
   notebook: notebooks-groebner/GroebnerBasis.ipynb
