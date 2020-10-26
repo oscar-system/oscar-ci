@@ -124,6 +124,10 @@ tests:
   notebook: notebooks-homalg/DivFreeNotIndFree.ipynb
   timeout: 300
   uses: notebook homalg gap
+- name: SymAlgIntToS4rep.ipynb
+  notebook: notebooks-homalg/SymmetricAlgebraInternalToS4rep.ipynb
+  timeout: 300
+  uses: notebook homalg gap
 - name: hom_vr_complexes.ipynb
   notebook: notebooks/homology_of_vr_complexes.ipynb
   timeout: 300

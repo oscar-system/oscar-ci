@@ -30,5 +30,6 @@ GroebnerBasis.ipynb: https://github.com/ederc/GroebnerBasisNotebooks
 TiltingEquivalence.ipynb: https://github.com/homalg-project/CapHomalgNotebooks
 AlgebraicGeometry.ipynb: https://github.com/oscar-system/OSCARBinder
 DivFreeNotIndFree.ipynb: https://github.com/homalg-project/CapHomalgNotebooks
+SymAlgIntToS4rep.ipynb: https://github.com/homalg-project/CapHomalgNotebooks
 hom_vr_complexes.ipynb: https://github.com/oscar-system/OSCARBinder
 persistent_hom_vr.ipynb: https://github.com/oscar-system/OSCARBinder
