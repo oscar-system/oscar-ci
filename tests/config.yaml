@@ -136,4 +136,4 @@ tests:
   notebook: notebooks/persistent_homology_of_vr_complexes_and_visualizations.ipynb
   timeout: 300
   uses: notebook polymake
-  standalone: yes
+  standalone: [ Oscar, Polymake ]

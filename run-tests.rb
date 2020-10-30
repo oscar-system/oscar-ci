@@ -379,14 +379,18 @@ class TestRunner
       log << "=== #{testname} at #{start_short}\n"
       testcmd = test_command(test)
       juliaenv = "#{$WORKSPACE}/julia-env"
-      if test["standalone"] == true then
+      standalone = test["standalone"]
+      extra_pkgs = []
+      if standalone then
         testdir = "#{$WORKSPACE}/test-env/#{testfilename}"
         FileUtils.rm_tree(testdir)
         FileUtils.mkdir_p(testdir)
-        FileUtils.cp File.join(juliaenv, "Project.toml"),
-          File.join(testdir, "Project.toml") rescue nil
-        FileUtils.cp File.join(juliaenv, "Manifest.toml"),
-          File.join(testdir, "Manifest.toml") rescue nil
+        case standalone
+        when String then
+          extra_pkgs = standalone.split
+        when Array then
+          extra_pkgs = standalone
+        end
       else
         testdir = "."
       end
@@ -399,17 +403,30 @@ class TestRunner
       pid = -1
       status = nil
       Timeout.timeout(timeout) do
-        pid =
-          if testcmd.is_a?(String) then
-            spawn(testenv, testcmd,
-              err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true,
-              chdir: testdir)
-          else
-            spawn(testenv, [ testcmd.first, testcmd.first ], *testcmd[1..-1],
-              err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true,
-              chdir: testdir)
+        proceed = true
+        for pkg in extra_pkgs do
+          pid = spawn(testenv,
+            "julia -e 'import Pkg; Pkg.activate(\".\"); Pkg.add(\"#{pkg}\")'",
+            out: [ logfile, "a"], err: :out, chdir: testdir)
+          _, status = Process.waitpid2(pid)
+          if not status.success? then
+            proceed = false
+            break
           end
-        _, status = Process.waitpid2(pid)
+        end
+        if proceed then
+          pid =
+            if testcmd.is_a?(String) then
+              spawn(testenv, testcmd,
+                err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true,
+                chdir: testdir)
+            else
+              spawn(testenv, [ testcmd.first, testcmd.first ], *testcmd[1..-1],
+                err: [ :child, :out ], out: [ logfile, "a" ], pgroup: true,
+                chdir: testdir)
+            end
+          _, status = Process.waitpid2(pid)
+        end
       end
       exitcode = status.exitstatus
       if exitcode.zero? then
