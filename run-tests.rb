@@ -407,7 +407,7 @@ class TestRunner
         for pkg in extra_pkgs do
           pid = spawn(testenv,
             "julia -e 'import Pkg; Pkg.activate(\".\"); Pkg.add(\"#{pkg}\")'",
-            out: [ logfile, "a"], err: :out, chdir: testdir)
+            err: [ :child, :out], out: [ logfile, "a"], chdir: testdir)
           _, status = Process.waitpid2(pid)
           if not status.success? then
             proceed = false
