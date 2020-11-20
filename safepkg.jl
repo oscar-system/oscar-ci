@@ -12,7 +12,9 @@ module SafePkg
     mode = m
   end
 
-  Master(name) = get(locations, name, PackageSpec(path=string(name, ".jl")))
+  localpath(p) = "$(ENV["WORKSPACE"])/$(p).jl"
+
+  Master(name) = get(locations, name, PackageSpec(path=localpath(name)))
   Stable(name) = get(locations, name, PackageSpec(name=name))
   GetPackageSpec(name) = mode == stable ? Stable(name) : Master(name)
 
@@ -53,6 +55,11 @@ module SafePkg
   end
 
   function add(pkg)
+    if startswith(pkg, "https:")
+      pkg = PackageSpec(url=pkg)
+    elseif startswith(pkg, "/")
+      pkg = PackageSpec(path=pkg)
+    end
     Safe(()->Pkg.add(pkg))
   end
 

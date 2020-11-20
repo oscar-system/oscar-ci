@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+require "yaml"
+require_relative "settings.rb"
+require_relative "utils.rb"
+
+test_config_path = expand_config_path($OscarConfig["tests"])
+test_config = YAML.safe_load(File.read(test_config_path))
+test_config["select"] = ARGV
+FileUtils.atomic_write(test_config_path, YAML.dump(test_config))

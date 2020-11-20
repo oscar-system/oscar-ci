@@ -1,0 +1,49 @@
+# Any downloads that are not Oscar packages, e.g. notebooks
+downloads:
+  - url: https://github.com/Singular/Singular
+    branch: spielwiese
+  - url: https://github.com/oscar-system/OSCARBinder
+    dir: notebooks
+  - url: https://github.com/micjoswig/oscar-notebooks
+    dir: notebooks-polymake
+  - url: https://github.com/homalg-project/CapHomalgNotebooks
+    dir: notebooks-homalg
+  - url: https://github.com/oscar-system/GITFans
+    dir: notebooks-gitfans
+  - url: https://github.com/ederc/GroebnerBasisNotebooks
+    dir: notebooks-groebner
+# Oscar packages
+packages:
+  - name: GAP
+    github: oscar-system/GAP.jl
+  - name: AbstractAlgebra
+    github: Nemocas/AbstractAlgebra.jl
+  - name: Nemo
+    github: Nemocas/Nemo.jl
+  - name: Hecke
+    github: thofma/Hecke.jl
+  - name: LoadFlint
+    github: oscar-system/LoadFlint.jl
+  - name: Singular
+    github: oscar-system/Singular.jl
+  - name: Polymake
+    github: oscar-system/Polymake.jl
+  - name: HomalgProject
+    github: homalg-project/HomalgProject.jl
+  - name: CapAndHomalg
+    github: homalg-project/CapAndHomalg.jl
+  - name: GroupAtlas
+    github: oscar-system/GroupAtlas.jl
+    devonly: true
+  - name: GroebnerBasis
+    github: ederc/GroebnerBasis.jl
+  - name: Oscar
+    github: oscar-system/Oscar.jl
+# Additional packages
+extra:
+  - ImplicitPlots
+  - Plots
+  - Distances
+  - HomotopyContinuation
+  - lib4ti2_jll
+  - https://github.com/oscar-system/GITFans

@@ -1,0 +1,9 @@
+jenkins: no
+workspace: workspace
+julia: download:1.4.2
+julia_env: workspace/julia-env
+jobs: 4
+buildtype: stable
+jupyter: workspace/jupyter
+packages: packages.yaml
+tests: tests.yaml

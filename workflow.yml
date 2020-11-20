@@ -1,0 +1,72 @@
+name: "Oscar CI"
+
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request: {}
+  workflow_dispatch: {}
+
+env:
+  OSCAR_CI_CONFIG: "config/standalone.yaml"
+  PKGNAME: "GAP"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: rbehrends/oscar-ci
+        ref: standalone
+    - uses: actions/checkout@v2
+      with:
+        path: current-rev
+    - name: Install APT packages
+      run: >-
+        sudo apt-get install -y
+        `ruby -r yaml -e 'puts YAML.load(File.read("config/apt.yaml"))'`
+    # This entry allows configuration of the CI via the switch-package,
+    # select-tests, and build-mode scripts.
+    #
+    # Use switch-package to set the url and branch for a package. This
+    # is if you want to override the default package location for a
+    # pull request
+    #
+    # Use select-tests to run only a subset of tests. The arguments
+    # should be one or more of:
+    # - init
+    # - packages
+    # - notebooks
+    #
+    # The init test alone verifies if all packages load and is very
+    # fast. The packages test set will run tests for all Oscar
+    # packages. The notebooks tests will also run notebook tests and
+    # can usually be omitted for GitHub Actions.
+    #
+    # The set-config script will change one ore more configuration
+    # variables. Most useful are the following:
+    #
+    #   buildtype: stable, develop, or master
+    #   jobs: number of tests to run in parallel.
+    #   julia: which version to use.
+    #     Fastest is "download:A.B.C", where A.B.C is the version
+    #     number. If a branch or tag is given, Julia will be built
+    #     from source.
+    #   workspace: path where Oscar will be built and tests will
+    #     be run.
+    #
+    # See config/standalone.yaml for all available settings.
+    - name: Configure Oscar CI
+      run: |
+        ./switch-package "$PKGNAME" "$GITHUB_WORKSPACE/current-rev"
+        ./select-tests init
+        ./set-config buildtype master
+    - name: Install OSCAR
+      run: "./install.rb"
+    - name: Run Oscar CI Tests
+      run: "./run-tests.rb"
+    - uses: actions/upload-artifact@v2
+      with:
+        name: logs
+        path: workspace/logs/
+      

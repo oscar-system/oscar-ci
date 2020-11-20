@@ -1,3 +1,4 @@
 #!/usr/bin/env ruby
 require_relative "../settings.rb"
-system! %q{julia -e 'include("meta/safepkg.jl"); SafePkg.precompile()'}
+safepkg = File.expand_path("#{__dir__}/../safepkg.jl")
+system! %Q{julia -e 'include("#{safepkg}"); SafePkg.precompile()'}

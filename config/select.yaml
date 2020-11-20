@@ -1,0 +1,4 @@
+select:
+- init
+# - packages
+# - notebooks

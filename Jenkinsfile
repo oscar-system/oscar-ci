@@ -79,6 +79,7 @@ node(label: nodeLabel) {
     def gap_version = "${params.GAP_VERSION}"
     def buildtype = "${params.BUILDTYPE}"
     def rebuild = rebuildMode()
+    env.OSCAR_CI_CONFIG = "meta/config/jenkins.yaml"
     try {
         stage('Preparation') {
 	    // Setup workspace.

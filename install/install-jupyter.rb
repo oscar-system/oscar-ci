@@ -15,7 +15,7 @@ system! "python3", File.join($WORKSPACE, File.basename(virtualenv_url)),
 system! "#{$IPYTHON}/bin/pip", "install", "--cache-dir",
   "#{$JUPYTER_BASE}/.pip-cache", "jupyter", "notebook"
 
-system! *%w{julia meta/install/install-jupyter.jl}
+system! "julia #{__dir__}/install-jupyter.jl"
 
 jupyter = "#{$IPYTHON}/bin/jupyter"
 FileUtils.ln_sf jupyter, "#{$WORKSPACE}/local/bin"

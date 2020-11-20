@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+require "yaml"
+require_relative "settings.rb"
+require_relative "utils.rb"
+name = ARGV.shift
+url = ARGV.shift
+branch = ARGV.shift
+
+package_config_path = expand_config_path($OscarConfig["packages"])
+package_config = YAML.safe_load(File.read(package_config_path))
+packages = package_config["packages"]
+found = false
+for i in 0...packages.size do
+  if packages[i]["name"] == name then
+    packages[i] = {
+      "name" => name,
+      "url" => url,
+      "branch" => branch
+    }
+    found = true
+    break
+  end
+end
+if not found then
+  packages.append({
+    "name" => name,
+    "url" => url,
+    "branch" => branch
+  })
+end
+FileUtils.atomic_write(package_config_path, YAML.dump(package_config))

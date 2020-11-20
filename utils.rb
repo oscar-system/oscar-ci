@@ -5,5 +5,10 @@ module FileUtils
     chmod_R("u=rwx", path, force: true)
     rm_rf(path)
   end
-  module_function :rm_tree
+  def atomic_write(file, data)
+    File.write(file+".tmp", data)
+    FileUtils.mv(file+".tmp", file, force: true)
+  end
+  module_function :rm_tree, :atomic_write
 end
+

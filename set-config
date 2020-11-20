@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+require "yaml"
+require_relative "settings.rb"
+require_relative "utils.rb"
+
+key = ARGV.shift
+value = YAML.load(ARGV.shift)
+
+config = YAML.safe_load(File.read($OscarConfigPath))
+config[key] = value
+FileUtils.atomic_write($OscarConfigPath, YAML.dump(config))

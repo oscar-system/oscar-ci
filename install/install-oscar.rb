@@ -3,4 +3,4 @@ require_relative "../settings"
 require_relative "../utils"
 
 FileUtils.rm_tree $JULIA_ENV
-system! "julia", "meta/install/install-oscar.jl"
+system! "julia", "#{__dir__}/install-oscar.jl"

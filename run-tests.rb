@@ -26,10 +26,11 @@ def parse_mem(data)
 end
 
 class GitServer
-  def initialize(sshbase, httpsbase, credfile)
+  def initialize(sshbase, httpsbase)
     @sshbase = sshbase
     @httpsbase = httpsbase
     @credentials = {}
+    credfile = $OscarConfig["credentials"]
     begin
       @credentials = YAML.safe_load(File.read(credfile))
     rescue
@@ -177,26 +178,33 @@ class TestRunner
     @repo = repo
     @tests = tests
     @failed_tests = false
-    @buildnum = ENV["BUILD_NUMBER"] || "0"
     @workspace = $WORKSPACE
     @job = repo.job
-    @buildurl = strip_trailing_slashes(ENV["BUILD_URL"])
-    @artifacturl = "#{@buildurl}/artifact"
-    @jenkinsurl = strip_trailing_slashes(ENV["JENKINS_URL"])
-    @maxjobs = (ENV["BUILDJOBS"] || 4).to_i
-    @logdir = "logs/build-#{@buildnum}"
-    @logurlbase = "#{@artifacturl}/#{@logdir}"
+    @jenkins = $OscarConfig["jenkins"]
+    if @jenkins then
+      @buildnum = $OscarConfig["buildnum"]
+      @buildurl = strip_trailing_slashes(ENV["BUILD_URL"])
+      @artifacturl = "#{@buildurl}/artifact"
+      @jenkinsurl = strip_trailing_slashes(ENV["JENKINS_URL"])
+      @logurlbase = "#{@artifacturl}/#{@logdir}"
+      @jenkinshome = File.expand_path("#{$WORKSPACE}/../..")
+      @jobstatepath = "#{@jenkinshome}/jobstate/#{@job}.yaml"
+      FileUtils.mkdir_p(File.dirname(@jobstatepath))
+      @jobstate = YAML::Store.new(@jobstatepath)
+    end
+    @maxjobs = ($OscarConfig["jobs"] || 4).to_i
+    if @buildnum then
+      @logdir = "#{$WORKSPACE}/logs/build-#{@buildnum}"
+    else
+      @logdir = "#{$WORKSPACE}/logs"
+    end
+    FileUtils.mkdir_p @logdir
     @startdate = nil
     @enddate = nil
     @successes = {}
     @failures = {}
     @testresults = {}
-    @jenkinshome = File.expand_path("#{$WORKSPACE}/../..")
-    @jobstatepath = "#{@jenkinshome}/jobstate/#{@job}.yaml"
-    FileUtils.mkdir_p(File.dirname(@jobstatepath))
-    @jobstate = YAML::Store.new(@jobstatepath)
     @lock = Thread::Mutex.new
-    @builddir = Dir.pwd
   end
 
   class Constraints
@@ -295,6 +303,7 @@ class TestRunner
   end
 
   private def update_jobstate(info, testname, exitcode)
+    return unless @jenkins
     last_success = first_failure = nil
     @lock.synchronize do
       @jobstate.transaction do
@@ -338,10 +347,8 @@ class TestRunner
   end
 
   private def test_command(test)
-    if test["script"] then
-      wspath(%Q{meta/tests/#{test["script"]}})
-    elsif test["sh"] then
-      test["sh"]
+    if test["sh"] then
+      %w{bash -c} + [ test["sh"] ]
     elsif test["julia"] then
       %w{julia -e} + [ test["julia"] ]
     elsif test["package"] then
@@ -352,7 +359,7 @@ class TestRunner
       gapcode = %Q{Read(Filename(DirectoriesPackageLibrary("#{test["gappkg"]}", "tst"), "testall.g"));}
       %w{gap --quitonbreak -c} + [ gapcode ]
     elsif test["notebook"] then
-      [ "ruby", wspath("meta/check-julia-notebook.rb"),
+      [ "ruby", "#{__dir__}/check-julia-notebook.rb",
         wspath(test["notebook"]) ]
     else
       fail "invalid test type" # TODO
@@ -366,7 +373,9 @@ class TestRunner
     info = { "name" => testname, "id" => testid }
     timeout = test["timeout"] || DEFAULT_TIMEOUT
     logfile = "#{@logdir}/#{testfilename}.log"
-    logurl = info["log"] = "#{@logurlbase}/#{testfilename}.log"
+    if @jenkins then
+      logurl = info["log"] = "#{@logurlbase}/#{testfilename}.log"
+    end
     log = Logger.new(logfile)
     begin
       start_time = Time.now
@@ -378,7 +387,7 @@ class TestRunner
       start_short = start_time.strftime("%H:%M")
       log << "=== #{testname} at #{start_short}\n"
       testcmd = test_command(test)
-      juliaenv = "#{$WORKSPACE}/julia-env"
+      juliaenv = $OscarConfig["julia_env"]
       standalone = test["standalone"]
       extra_pkgs = []
       if standalone then
@@ -498,7 +507,7 @@ class TestRunner
     successes = ordered(@successes)
     failures = ordered(@failures)
     report = []
-    report << "## [Build #{@buildnum}](#{buildurl})\n\n"
+    report << "## [Build #{@buildnum}](#{buildurl})\n\n" if @buildnum
     report << "* Started on: #{@start_date}\n"
     report << "* Ended on: #{@end_date}\n\n"
     report << "| Test Name    | Result | Start | Duration | Last Success | First Failure |\n"
@@ -506,7 +515,7 @@ class TestRunner
     report << "#{failures.join("\n")}\n" unless failures.empty?
     report << "#{successes.join("\n")}\n" unless successes.empty?
     @report = report.join
-    puts "Logs: #{@logurlbase}"
+    puts "Logs: #{@logurlbase}" if @logurlbase
   end
 
   def run_all(parallelize:, memlimit: nil)
@@ -521,7 +530,7 @@ class TestRunner
       end
     end
     finish_report
-    if @repo.path then
+    if @jenkins and @repo.path then
       @repo.upload(@job, "Build ##{@buildnum}",
         dirs: [
           "meta/layout",
@@ -546,26 +555,32 @@ end
 def get_par_info(parallelize)
   case parallelize
   when nil, false, true then
-    parallelize ? (ENV["BUILDJOBS"] || 4).to_i : 0
+    parallelize ? ($OscarConfig["jobs"] || 4).to_i : 0
   when Integer then
     [ parallelize, 0 ].max
   when Hash then
     value = parallelize
-    value ||= (ENV["BUILDJOBS"] || 4).to_i
+    value ||= ($OscarConfig["jobs"] || 4).to_i
   end
 end
 
 def main
-  FileUtils.mkdir_p "logs"
-  jobname = ENV["JOB_NAME"]
-  config = YAML.safe_load(File.read("meta/tests/config.yaml"))
+  jobname = $OscarConfig["jobname"]
+  tests = $OscarConfig["tests"]
+  testconfig = File.expand_path(tests, File.dirname($OscarConfigPath))
+  config = YAML.safe_load(File.read(testconfig))
   if config["jobinfo"] then
     config.update(config["jobinfo"][jobname] || {})
   end
-  github = GitServer.new("ssh://git@github.com", "https://github.com",
-    ENV["CREDENTIALS"] || "/config/credentials.yaml")
+  github = GitServer.new("ssh://git@github.com", "https://github.com")
   repo = GitRepo.new(github, jobname)
-  tests = config["tests"]
+  tests = []
+  for name, testset in config["tests"] do
+    select = config["select"]
+    if select.nil? || select.include?(name) then
+      tests.concat testset
+    end
+  end
   parallelize = get_par_info(config["parallelize"])
   memlimit = parse_mem(config["memlimit"])
   testrunner = TestRunner.new(repo, tests)

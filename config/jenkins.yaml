@@ -1,0 +1,18 @@
+% workspace = ENV["WORKSPACE"]
+% buildnum = ENV["BUILD_NUMBER"]
+% buildtype = ENV["BUILDTYPE"]
+% jobs = ENV["BUILDJOBS"]
+% jobname = ENV["JOB_NAME"]
+% julia_version = ENV["JULIA_VERSION"]
+jenkins: yes
+workspace: "<%= workspace%>"
+julia: "<%= julia_version %>"
+julia_env: "<%= workspace%>/julia-env"
+buildnum: <%= buildnum %>
+jobs: <%= jobs %>
+jobname: <%= jobname %>
+buildtype: <%= buildtype %>
+jupyter: "<%= workspace %>/jupyter"
+credentials: /config/credentials.yaml
+packages: packages.yaml
+tests: tests.yaml
