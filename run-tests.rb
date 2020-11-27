@@ -183,6 +183,11 @@ class TestRunner
     @jenkins = $OscarConfig["jenkins"]
     if @jenkins then
       @buildnum = $OscarConfig["buildnum"]
+      if @buildnum then
+        @logdir = "logs/build-#{@buildnum}"
+      else
+        @logdir = "logs"
+      end
       @buildurl = strip_trailing_slashes(ENV["BUILD_URL"])
       @artifacturl = "#{@buildurl}/artifact"
       @jenkinsurl = strip_trailing_slashes(ENV["JENKINS_URL"])
@@ -193,11 +198,7 @@ class TestRunner
       @jobstate = YAML::Store.new(@jobstatepath)
     end
     @maxjobs = ($OscarConfig["jobs"] || 4).to_i
-    if @buildnum then
-      @logdir = "#{$WORKSPACE}/logs/build-#{@buildnum}"
-    else
-      @logdir = "#{$WORKSPACE}/logs"
-    end
+    @logdir = "#{$WORKSPACE}/#{@logdir}"
     FileUtils.mkdir_p @logdir
     @startdate = nil
     @enddate = nil
