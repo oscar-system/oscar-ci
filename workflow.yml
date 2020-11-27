@@ -35,13 +35,15 @@ jobs:
     # Use select-tests to run only a subset of tests. The arguments
     # should be one or more of:
     # - init
-    # - packages
+    # - core
+    # - extra
     # - notebooks
     #
     # The init test alone verifies if all packages load and is very
-    # fast. The packages test set will run tests for all Oscar
-    # packages. The notebooks tests will also run notebook tests and
-    # can usually be omitted for GitHub Actions.
+    # fast. The core test set will run tests for all Oscar core
+    # packages. The extra tests will run tests for additional packages
+    # that are not part of Oscar proper. The notebooks tests will also
+    # run notebook tests and can usually be omitted for GitHub Actions.
     #
     # The set-config script will change one ore more configuration
     # variables. Most useful are the following:

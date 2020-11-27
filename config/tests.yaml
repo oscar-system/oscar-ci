@@ -25,7 +25,8 @@ jobinfo:
     memlimit: 2G
 select:
   - init
-  - packages
+  - core
+  - extra
   - notebooks
 tests:
   init:
@@ -36,7 +37,7 @@ tests:
         test -r "$PKGLOG" && cat "$PKGLOG"
         julia "$OSCAR_SCRIPT_DIR/packages-test.jl"
       uses: "*"
-  packages:
+  core:
     - name: GAP
       sh: |
         set -e
@@ -64,10 +65,6 @@ tests:
     - name: Polymake.jl
       package: Polymake
       uses: polymake
-    - name: GroupAtlas.jl
-      package: GroupAtlas
-    - name: GroebnerBasis.jl
-      package: GroebnerBasis
     - name: JuliaInterface
       gappkg: JuliaInterface
       uses: gap
@@ -76,6 +73,11 @@ tests:
       uses: gap
     - name: Oscar.jl
       package: Oscar
+  extra:
+    - name: GroupAtlas.jl
+      package: GroupAtlas
+    - name: GroebnerBasis.jl
+      package: GroebnerBasis
     - name: NemoLinearAlgebraForCAP
       sh: |
         make -C "$(julia meta/gappkgpath.jl)"/NemoLinearAlgebraForCAP test
