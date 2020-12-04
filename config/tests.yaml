@@ -56,9 +56,6 @@ tests:
       package: AbstractAlgebra
     - name: Singular.jl
       package: Singular
-    - name: HomalgProject.jl
-      package: HomalgProject
-      uses: homalg gap
     - name: CapAndHomalg.jl
       package: CapAndHomalg
       uses: homalg gap
