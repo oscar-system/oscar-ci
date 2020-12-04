@@ -28,8 +28,6 @@ packages:
     github: oscar-system/Singular.jl
   - name: Polymake
     github: oscar-system/Polymake.jl
-  - name: HomalgProject
-    github: homalg-project/HomalgProject.jl
   - name: CapAndHomalg
     github: homalg-project/CapAndHomalg.jl
   - name: GroupAtlas
