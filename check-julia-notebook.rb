@@ -28,6 +28,6 @@ success = system env, "jupyter", "nbconvert",
   notebook
 
 puts "=== notebook diff for #{basename}"
-system env, "meta/nb-diff", "-w", notebook, "notebooks-out/#{basename}"
+system env, "#{__dir__}/nb-diff", "-w", notebook, "notebooks-out/#{basename}"
 
 exit success

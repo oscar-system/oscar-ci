@@ -534,7 +534,7 @@ class TestRunner
     if @jenkins and @repo.path then
       @repo.upload(@job, "Build ##{@buildnum}",
         dirs: [
-          "meta/layout",
+          "#{__dir__}/layout",
         ],
         files: {
           "README.md" => @report,
